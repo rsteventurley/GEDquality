@@ -1,0 +1,1763 @@
+﻿0 HEAD
+1 SOUR RootsMagic
+2 NAME RootsMagic
+2 CORP RootsMagic, Inc.
+3 ADDR PO Box 495
+4 CONT Springville, UT 84663
+4 CONT USA
+3 PHON 1-800-ROOTSMAGIC
+3 WWW www.RootsMagic.com
+1 DEST RootsMagic
+1 DATE 30 MAY 2025
+1 FILE Tannenkirch.000.ged
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+0 @I1@ INDI
+1 NAME Johann Friedrich /Aberer/
+2 GIVN Johann Friedrich
+2 SURN Aberer
+1 SEX M
+1 _UID 16DF08F0F6DA4B58B588A0F9FA9DA9AC22B7
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 1
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 1
+2 NAME 1
+1 BIRT
+2 DATE 10 SEP 1802
+2 PLAC Egringen
+1 DEAT
+2 DATE 22 APR 1869
+2 PLAC Tannenkirch
+1 REFN p1
+1 FAMS @F1@
+1 FAMC @F2@
+0 @I2@ INDI
+1 NAME Maria Katharina /Schmiedlin/
+2 GIVN Maria Katharina
+2 SURN Schmiedlin
+1 SEX F
+1 _UID E4E332C41721461D97F68885C46B6425AAF6
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 1
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 1
+2 NAME 1
+1 BIRT
+2 DATE 27 APR 1808
+2 PLAC Mappach
+1 DEAT
+2 DATE 17 MAY 1882
+2 PLAC Tannenkirch
+1 REFN p4
+1 FAMS @F1@
+0 @I3@ INDI
+1 NAME Johann Georg /Aberer/
+2 GIVN Johann Georg
+2 SURN Aberer
+1 SEX M
+1 _UID A4982387B6CA4C7E98A8EF92A287730F9C67
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 1
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 1
+2 NAME 1
+1 REFN p2
+1 DEAT Y
+1 FAMS @F2@
+0 @I4@ INDI
+1 NAME Elisabetha /Sutter/
+2 GIVN Elisabetha
+2 SURN Sutter
+1 SEX F
+1 _UID 11BFEC1A26AE451B85CA279C4ED9AFD2C4F9
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 1
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 1
+2 NAME 1
+1 REFN p3
+1 DEAT Y
+1 FAMS @F2@
+0 @I5@ INDI
+1 NAME Rebekka /Aberer/
+2 GIVN Rebekka
+2 SURN Aberer
+1 SEX F
+1 _UID 0D24FB8DBF1E4054944030C93C80C75FD94B
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 1
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 1
+2 NAME 1
+1 REFN p5
+1 EVEN 66
+2 TYPE Cref
+1 DEAT Y
+1 FAMC @F1@
+0 @I6@ INDI
+1 NAME Johann Friedrich /Aberer/
+2 GIVN Johann Friedrich
+2 SURN Aberer
+1 SEX M
+1 _UID CEDF27A98088485B859B6A714CDA3170EA29
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 2
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 2
+2 NAME 2
+1 BIRT
+2 DATE 30 SEP 1856
+2 PLAC Egringen
+1 REFN p6
+1 DEAT Y
+1 FAMS @F3@
+1 FAMC @F4@
+0 @I7@ INDI
+1 NAME Maria Katharina /Braun/
+2 GIVN Maria Katharina
+2 SURN Braun
+1 SEX F
+1 _UID B17DD072B3D9418297F9F5351C6E4F90E296
+1 CHAN
+2 DATE 30 MAY 2025
+1 SOUR @S1@
+2 PAGE 2
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 2
+2 NAME 2
+1 BIRT
+2 DATE 19 DEC 1860
+1 REFN p9
+1 EVEN 162
+2 TYPE Cref
+1 DEAT Y
+1 FAMS @F3@
+0 @I8@ INDI
+1 NAME Johann Friedrich /Aberer/
+2 GIVN Johann Friedrich
+2 SURN Aberer
+1 SEX M
+1 _UID 850352E60C0C47B59E3636B0DEB5D068599B
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 2
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 2
+2 NAME 2
+1 REFN p7
+1 DEAT Y
+1 FAMS @F4@
+0 @I9@ INDI
+1 NAME Maria Magdalena /Enderlin/
+2 GIVN Maria Magdalena
+2 SURN Enderlin
+1 SEX F
+1 _UID 38C61BC341604731BA256601FE492E0DBD9E
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 2
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 2
+2 NAME 2
+1 REFN p8
+1 DEAT Y
+1 FAMS @F4@
+0 @I10@ INDI
+1 NAME Jakob /Ackermann/
+2 GIVN Jakob
+2 SURN Ackermann
+1 SEX M
+1 _UID 99EEA8E9203A45368639C2F8540453C6D708
+1 CHAN
+2 DATE 18 FEB 2025
+1 SOUR @S1@
+2 PAGE 3
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 3
+2 NAME 3
+1 BIRT
+2 DATE 15 OCT 1820
+1 DEAT
+2 DATE 18 MAY 1880
+1 REFN p10
+1 FAMS @F6@
+1 FAMC @F5@
+0 @I11@ INDI
+1 NAME Johannes /Ackermann/
+2 GIVN Johannes
+2 SURN Ackermann
+1 SEX M
+1 _UID 804CB05E330F45ACAA2D02DA2ACDE0E98032
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 3
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 3
+2 NAME 3
+1 REFN p11
+1 DEAT Y
+1 FAMS @F5@
+0 @I12@ INDI
+1 NAME Anna Maria /Rohlin/
+2 GIVN Anna Maria
+2 SURN Rohlin
+1 SEX F
+1 _UID 18AA457932604F89BC651CC8A721A17CD4B0
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 3
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 3
+2 NAME 3
+1 REFN p12
+1 EVEN 1251
+2 TYPE Cref
+1 EVEN 1257
+2 TYPE Cref
+1 EVEN 1209
+2 TYPE Cref
+1 DEAT Y
+1 FAMS @F6@
+0 @I13@ INDI
+1 NAME Jakob Friedrich /Ackermann/
+2 GIVN Jakob Friedrich
+2 SURN Ackermann
+1 SEX M
+1 _UID 1AF5D16DF4A8445B806202E07A248C4BC146
+1 CHAN
+2 DATE 12 FEB 2025
+1 SOUR @S1@
+2 PAGE 3
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 3
+2 NAME 3
+1 BIRT
+2 DATE 9 MAY 1846
+1 DEAT
+2 DATE 4 JUN 1873
+2 PLAC Dömitz
+1 REFN p13
+1 FAMC @F6@
+0 @I14@ INDI
+1 NAME Johannes /Amacker/
+2 GIVN Johannes
+2 SURN Amacker
+1 SEX M
+1 _UID 582429F3EF59404FA9D6C3796252347183E7
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 4
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 4
+2 NAME 4
+1 BIRT
+2 DATE ABT 1705
+1 DEAT
+2 DATE 24 SEP 1760
+1 REFN p14
+1 FAMS @F8@
+1 FAMC @F7@
+0 @I15@ INDI
+1 NAME Christian /Amacker/
+2 GIVN Christian
+2 SURN Amacker
+1 SEX M
+1 _UID 87D5BC39448A494D8772F5C869694177F599
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 4
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 4
+2 NAME 4
+1 REFN p15
+1 DEAT Y
+1 FAMS @F7@
+0 @I16@ INDI
+1 NAME Maria /Schneider/
+2 GIVN Maria
+2 SURN Schneider
+1 SEX F
+1 _UID 0C32F9037B0C40ECB339196F0E842BC4E24D
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 4
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 4
+2 NAME 4
+1 BIRT
+2 DATE 31 JAN 1688
+1 DEAT
+2 DATE 24 DEC 1761
+1 REFN p16
+1 EVEN 1375
+2 TYPE Cref
+1 EVEN 295
+2 TYPE Cref
+1 FAMS @F8@
+0 @I17@ INDI
+1 NAME Maria Magdalena /Äntlicker/
+2 GIVN Maria Magdalena
+2 SURN Äntlicker
+1 SEX F
+1 _UID 06AA933AAB27454393E6BA16CE04DF471805
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 5
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 5
+2 NAME 5
+1 BIRT
+2 DATE ABT 1719
+1 DEAT
+2 DATE 15 AUG 1726
+1 REFN p17
+1 FAMC @F9@
+0 @I18@ INDI
+1 NAME Peter /Äntlicker/
+2 GIVN Peter
+2 SURN Äntlicker
+1 SEX M
+1 _UID B064CAD5D32C4FD59FE66C6433660D61324B
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 5
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 5
+2 NAME 5
+1 REFN p18
+1 DEAT Y
+1 FAMS @F9@
+0 @I19@ INDI
+1 NAME Elisabetha /Spring/
+2 GIVN Elisabetha
+2 SURN Spring
+1 SEX F
+1 _UID FCB75B3533D8476D96784676951F672A11FE
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 5
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 5
+2 NAME 5
+1 REFN p19
+1 DEAT Y
+1 FAMS @F9@
+0 @I20@ INDI
+1 NAME Johann Jakob /Arnold/
+2 GIVN Johann Jakob
+2 SURN Arnold
+1 SEX M
+1 _UID CC7C0B26A793411AA5647F4609CC4C615EE2
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 6
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 6
+2 NAME 6
+1 BIRT
+2 DATE 23 JUL 1807
+1 REFN p20
+1 DEAT Y
+1 FAMS @F11@
+1 FAMC @F10@
+0 @I21@ INDI
+1 NAME Johannes /Arnold/
+2 GIVN Johannes
+2 SURN Arnold
+1 SEX M
+1 _UID 43B09FFFDA874EA8BB75A8FFEDBA4CD38561
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 6
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 6
+2 NAME 6
+1 REFN p21
+1 DEAT Y
+1 FAMS @F10@
+0 @I22@ INDI
+1 NAME Anna Maria /Huft/
+2 GIVN Anna Maria
+2 SURN Huft
+1 SEX F
+1 _UID 459FCD5756184BA9B6DC7CA030BBB39248D6
+1 CHAN
+2 DATE 28 MAY 2025
+1 SOUR @S1@
+2 PAGE 6
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 6
+2 NAME 6
+1 REFN p22
+1 DEAT Y
+1 FAMS @F10@
+0 @I23@ INDI
+1 NAME Ursula /Siegin/
+2 GIVN Ursula
+2 SURN Siegin
+1 SEX F
+1 _UID 566B89DD8B594C969DD316395010B82BEF4A
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 6
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 6
+2 NAME 6
+1 BIRT
+2 DATE 17 SEP 1807
+1 REFN p23
+1 EVEN 1500
+2 TYPE Cref
+1 DEAT Y
+1 FAMS @F11@
+0 @I24@ INDI
+1 NAME Maria /Arnold/
+2 GIVN Maria
+2 SURN Arnold
+1 SEX F
+1 _UID 4CDC17EF67EAEF11B89A0A133EFD21A8F244
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 7
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 7
+2 NAME 7
+1 BIRT
+2 DATE ABT 1658
+1 DEAT
+2 DATE 14 OCT 1691
+1 REFN p24
+1 FAMC @F12@
+0 @I25@ INDI
+1 NAME Peter /Arnold/
+2 GIVN Peter
+2 SURN Arnold
+1 SEX M
+1 _UID 4458172168EAEF11B89A0A133EFD21A8999E
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 7
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 7
+2 NAME 7
+1 REFN p25
+1 DEAT Y
+1 FAMS @F12@
+0 @I26@ INDI
+1 NAME Heinrich /Auderer/
+2 GIVN Heinrich
+2 SURN Auderer
+1 SEX M
+1 _UID 3E8BC42769EAEF11B89A0A133EFD21A87A0B
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 8
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 8
+2 NAME 8
+1 BIRT
+2 DATE ABT 1860
+2 PLAC Schollbrunn
+1 DEAT
+2 DATE 1923
+2 PLAC Besigheim
+1 REFN p26
+1 FAMC @F13@
+0 @I27@ INDI
+1 NAME  /Auderer/
+2 SURN Auderer
+1 SEX M
+1 _UID 72028B6F69EAEF11B89A0A133EFD21A834CE
+1 CHAN
+2 DATE 13 FEB 2025
+1 SOUR @S1@
+2 PAGE 8
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 8
+2 NAME 8
+1 REFN p27
+1 DEAT Y
+1 FAMS @F13@
+0 @I28@ INDI
+1 NAME Johann Jakob /Baltzweiler/
+2 GIVN Johann Jakob
+2 SURN Baltzweiler
+1 SEX M
+1 _UID CEA0DC21D2ECEF11B0130A133EFD21A80D59
+1 CHAN
+2 DATE 16 FEB 2025
+1 SOUR @S1@
+2 PAGE 9
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 9
+2 NAME 9
+1 BIRT
+2 DATE 24 FEB 1707
+1 DEAT
+2 DATE 5 DEC 1794
+1 REFN p28
+1 FAMS @F14@
+0 @I29@ INDI
+1 NAME Regina Ursula /Stählin/
+2 GIVN Regina Ursula
+2 SURN Stählin
+1 SEX F
+1 _UID 1CEF1E01D3ECEF11B0130A133EFD21A8CDE2
+1 CHAN
+2 DATE 18 FEB 2025
+1 SOUR @S1@
+2 PAGE 9
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 9
+2 NAME 9
+1 BIRT
+2 DATE 6 DEC 1705
+1 DEAT
+2 DATE 14 MAR 1775
+1 REFN p29
+1 FAMS @F14@
+0 @I31@ INDI
+1 NAME Maria Katharina /Baltzweiler/
+2 GIVN Maria Katharina
+2 SURN Baltzweiler
+1 SEX F
+1 _UID CCE5C43867EDEF11A9530A133EFD21A71DAD
+1 CHAN
+2 DATE 18 FEB 2025
+1 SOUR @S1@
+2 PAGE 9
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 9
+2 NAME 9
+1 BIRT
+2 DATE 16 JUN 1739
+1 DEAT
+2 DATE 25 NOV 1788
+1 REFN p30
+1 FAMC @F14@
+0 @I32@ INDI
+1 NAME Wilhelmine Elisabeth /Baltzweiler/
+2 GIVN Wilhelmine Elisabeth
+2 SURN Baltzweiler
+1 SEX F
+1 _UID A00C9C1F68EDEF118A3B0A133EFD21A7A12D
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 9
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 9
+2 NAME 9
+1 BIRT
+2 DATE 7 MAR 1741
+2 PLAC Bötzingen
+1 DEAT
+2 DATE 7 SEP 1811
+1 REFN p31
+1 FAMC @F14@
+0 @I33@ INDI
+1 NAME Regina Dorothea /Baltzweiler/
+2 GIVN Regina Dorothea
+2 SURN Baltzweiler
+1 SEX F
+1 _UID 32EB85C468EDEF118A3B0A133EFD21A7A07D
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 9
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 9
+2 NAME 9
+1 BIRT
+2 DATE 30 JUN 1745
+1 DEAT
+2 DATE 1 JUL 1760
+1 REFN p32
+1 FAMC @F14@
+0 @I34@ INDI
+1 NAME Anna Katharina /Baltzweiler/
+2 GIVN Anna Katharina
+2 SURN Baltzweiler
+1 SEX F
+1 _UID 20D8F40169EDEF118A3B0A133EFD21A72877
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 9
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 9
+2 NAME 9
+1 REFN p33
+1 DEAT Y
+1 FAMC @F14@
+0 @I35@ INDI
+1 NAME Wilhelm /Baltzweiler/
+2 GIVN Wilhelm
+2 SURN Baltzweiler
+1 SEX M
+1 _UID 9A0B6C6469EDEF118A3B0A133EFD21A7B0AB
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 9
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 9
+2 NAME 9
+1 REFN p34
+1 EVEN 10
+2 TYPE Cref
+1 DEAT Y
+1 FAMS @F16@
+1 FAMC @F14@
+0 @I36@ INDI
+1 NAME Catharina Elisabeth /Stahl/
+2 GIVN Catharina Elisabeth
+2 SURN Stahl
+1 NAME Catharina Elisabeth /Stählin/
+2 GIVN Catharina Elisabeth
+2 SURN Stählin
+1 SEX F
+1 _UID 268FC9C86AEDEF118A3B0A133EFD21A7825D
+1 CHAN
+2 DATE 18 FEB 2025
+1 SOUR @S1@
+2 PAGE 10
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 10
+2 NAME 10
+1 REFN p35
+1 DEAT Y
+1 FAMS @F16@
+0 @I37@ INDI
+1 NAME Johann Jakob /Baltzweiler/
+2 GIVN Johann Jakob
+2 SURN Baltzweiler
+1 SEX M
+1 _UID 64DBC2676BEDEF118A3B0A133EFD21A7A56E
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 10
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 10
+2 NAME 10
+1 BIRT
+2 DATE 30 JUL 1766
+1 DEAT
+2 DATE 23 FEB 1830
+2 PLAC Langenau bei Schopfheim
+1 REFN p36
+1 FAMC @F16@
+0 @I39@ INDI
+1 NAME  /Baltzweiler/
+2 SURN Baltzweiler
+1 SEX M
+1 _UID 5A2D9E986CEDEF118A3B0A133EFD21A7FB2D
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 10
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 10
+2 NAME 10
+1 BIRT
+2 DATE 9 MAR 1769
+1 DEAT
+2 DATE 9 MAR 1769
+1 REFN p37
+1 FAMC @F16@
+0 @I40@ INDI
+1 NAME Friedrich /Bammerlin/
+2 GIVN Friedrich
+2 SURN Bammerlin
+1 SEX M
+1 _UID 30C865FF6DEDEF118A3B0A133EFD21A79BCB
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 BIRT
+2 DATE 22 MAR 1748
+2 PLAC Holzen
+1 DEAT
+2 DATE 13 DEC 1809
+2 PLAC Tannenkirch
+1 REFN p38
+1 FAMS @F19@
+1 FAMC @F18@
+0 @I41@ INDI
+1 NAME Christoph Leonhard /Bammerlin/
+2 GIVN Christoph Leonhard
+2 SURN Bammerlin
+1 SEX M
+1 _UID 4CF519666EEDEF118A3B0A133EFD21A7004D
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 REFN p39
+1 DEAT Y
+1 FAMS @F18@
+0 @I42@ INDI
+1 NAME Maria Magdalena /Hagin/
+2 GIVN Maria Magdalena
+2 SURN Hagin
+1 SEX F
+1 _UID 306734BE6EEDEF118A3B0A133EFD21A7C92D
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 REFN p40
+1 DEAT Y
+1 FAMS @F18@
+0 @I43@ INDI
+1 NAME Barbara /Fürst/
+2 GIVN Barbara
+2 SURN Fürst
+1 SEX F
+1 _UID 0082C65E6FEDEF118A3B0A133EFD21A7E7EA
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 BIRT
+2 DATE 24 FEB 1748
+1 DEAT
+2 DATE 15 APR 1803
+1 REFN p41
+1 EVEN 449
+2 TYPE Cref
+1 FAMS @F19@
+0 @I45@ INDI
+1 NAME Barbara /Bammerlin/
+2 GIVN Barbara
+2 SURN Bammerlin
+1 SEX F
+1 _UID 183D20F574EDEF118A3B0A133EFD21A7B032
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 BIRT
+2 DATE 8 JUN 1778
+1 DEAT
+2 DATE 29 APR 1779
+1 REFN p42
+1 FAMC @F19@
+0 @I46@ INDI
+1 NAME Maria /Bammerlin/
+2 GIVN Maria
+2 SURN Bammerlin
+1 SEX F
+1 _UID BEC0126575EDEF118A3B0A133EFD21A73C37
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 BIRT
+2 DATE 8 JUN 1778
+1 DEAT
+2 DATE 29 MAR 1779
+1 REFN p43
+1 FAMC @F19@
+0 @I47@ INDI
+1 NAME Johann Friedrich /Bammerlin/
+2 GIVN Johann Friedrich
+2 SURN Bammerlin
+1 SEX M
+1 _UID 18ED42BD75EDEF118A3B0A133EFD21A74B92
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 REFN p44
+1 EVEN 14
+2 TYPE Cref
+1 DEAT Y
+1 FAMC @F19@
+0 @I48@ INDI
+1 NAME  /Bammerlin/
+2 SURN Bammerlin
+1 SEX F
+1 _UID F2A6552F76EDEF118A3B0A133EFD21A764E9
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 BIRT
+2 DATE 18 JUN 1783
+1 DEAT
+2 DATE 18 JUN 1783
+1 REFN p45
+1 FAMC @F19@
+0 @I49@ INDI
+1 NAME Johann Friedrich /Bammerlin/
+2 GIVN Johann Friedrich
+2 SURN Bammerlin
+1 SEX M
+1 _UID CC15B33A79EDEF118A3B0A133EFD21A719E1
+1 CHAN
+2 DATE 17 FEB 2025
+1 SOUR @S1@
+2 PAGE 11
+2 _TMPLT
+3 FIELD
+4 NAME Page
+4 VALUE 11
+2 NAME 11
+1 REFN p46
+1 EVEN 15
+2 TYPE Cref
+1 DEAT Y
+1 FAMC @F19@
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 CHIL @I5@
+1 MARR
+0 @F2@ FAM
+1 HUSB @I3@
+1 WIFE @I4@
+1 CHIL @I1@
+0 @F3@ FAM
+1 HUSB @I6@
+1 WIFE @I7@
+1 MARR
+2 DATE 24 FEB 1885
+0 @F4@ FAM
+1 HUSB @I8@
+1 WIFE @I9@
+1 CHIL @I6@
+0 @F5@ FAM
+1 HUSB @I11@
+1 CHIL @I10@
+0 @F6@ FAM
+1 HUSB @I10@
+1 WIFE @I12@
+1 CHIL @I13@
+0 @F7@ FAM
+1 HUSB @I15@
+1 CHIL @I14@
+0 @F8@ FAM
+1 HUSB @I14@
+1 WIFE @I16@
+0 @F9@ FAM
+1 HUSB @I18@
+1 WIFE @I19@
+1 CHIL @I17@
+0 @F10@ FAM
+1 HUSB @I21@
+1 WIFE @I22@
+1 CHIL @I20@
+0 @F11@ FAM
+1 HUSB @I20@
+1 WIFE @I23@
+1 MARR
+2 DATE 21 APR 1838
+0 @F12@ FAM
+1 HUSB @I25@
+1 CHIL @I24@
+0 @F13@ FAM
+1 HUSB @I27@
+1 CHIL @I26@
+0 @F14@ FAM
+1 HUSB @I28@
+1 WIFE @I29@
+1 CHIL @I31@
+1 CHIL @I32@
+1 CHIL @I33@
+1 CHIL @I34@
+1 CHIL @I35@
+0 @F16@ FAM
+1 HUSB @I35@
+1 WIFE @I36@
+1 CHIL @I39@
+1 CHIL @I37@
+0 @F18@ FAM
+1 HUSB @I41@
+1 WIFE @I42@
+1 CHIL @I40@
+0 @F19@ FAM
+1 HUSB @I40@
+1 WIFE @I43@
+1 CHIL @I45@
+1 CHIL @I46@
+1 CHIL @I47@
+1 CHIL @I48@
+1 CHIL @I49@
+1 MARR
+2 DATE 11 AUG 1777
+0 @S1@ SOUR
+1 ABBR Tannenkirch
+1 _TMPLT
+2 TID 0
+2 FIELD
+3 NAME Footnote
+2 FIELD
+3 NAME ShortFootnote
+2 FIELD
+3 NAME Bibliography
+0 _EVDEF BIRT
+1 TYPE P
+1 TITL Birth
+1 ABBR Birth
+1 SENT [person] was born< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the birth of [person]< [Date]>< [PlaceDetails]>< [
+3 CONC Place]>.
+1 ROLE Doctor
+2 SENT [ThisPerson] delivered [person]< [Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF DEAT
+1 TYPE P
+1 TITL Death
+1 ABBR Death
+1 SENT [person] died< [Desc]>< [Date]>< [person:Age]>< [PlaceDetails]>< [Place
+2 CONC ]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the death of [person]< [Date]>< [PlaceDetails]>< [
+3 CONC Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF CHR
+1 TYPE P
+1 TITL Christen
+1 ABBR Chr
+1 SENT [person] was christened< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the christening of [person]< [Date]>< [PlaceDeta
+3 CONC ils]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF BURI
+1 TYPE P
+1 TITL Burial
+1 ABBR Burial
+1 SENT [person] was buried< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the burial of [person]< [Date]>< [PlaceDetails]>
+3 CONC < [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF CREM
+1 TYPE P
+1 TITL Cremation
+1 ABBR Cremation
+1 SENT [person] was cremated< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the cremation of [person]< [Date]>< [PlaceDetail
+3 CONC s]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF ADOP
+1 TYPE P
+1 TITL Adoption
+1 ABBR Adoption
+1 SENT [person] was adopted< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the adoption of [person]< [Date]>< [PlaceDetails
+3 CONC ]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF BAPM
+1 TYPE P
+1 TITL Baptism
+1 ABBR Baptism
+1 SENT [person] was baptized< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the baptism of [person]< [Date]>< [PlaceDetails]
+3 CONC >< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF BARM
+1 TYPE P
+1 TITL Bar Mitzvah
+1 ABBR Bar Mitzvah
+1 SENT [person] celebrated his bar mitzvah< [Date]>< [PlaceDetails]>< [Place]>
+2 CONC .
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the bar mitzvah of [person]< [Date]>< [PlaceDeta
+3 CONC ils]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF BASM
+1 TYPE P
+1 TITL Bas Mitzvah
+1 ABBR Bas Mitzvah
+1 SENT [person] celebrated her bas mitzvah< [Date]>< [PlaceDetails]>< [Place]>
+2 CONC .
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the bas mitzvah of [person]< [Date]>< [PlaceDeta
+3 CONC ils]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF BLES
+1 TYPE P
+1 TITL Blessing
+1 ABBR Blessing
+1 SENT [person] was blessed< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the blessing of [person]< [Date]>< [PlaceDetails
+3 CONC ]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF CHRA
+1 TYPE P
+1 TITL Christen (adult)
+1 ABBR Chr (adult)
+1 SENT [person] was christened< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the christening of [person]< [Date]>< [PlaceDeta
+3 CONC ils]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF CONF
+1 TYPE P
+1 TITL Confirmation
+1 ABBR Confirmation
+1 SENT [person] was confirmed< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the confirmation of [person]< [Date]>< [PlaceDet
+3 CONC ails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF FCOM
+1 TYPE P
+1 TITL First communion
+1 ABBR First comm
+1 SENT [person] received first communion< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the first communion of [person]< [Date]>< [Place
+3 CONC Details]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF ORDN
+1 TYPE P
+1 TITL Ordination
+1 ABBR Ordination
+1 SENT [person] was ordained< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the ordination of [person]< [Date]>< [PlaceDetai
+3 CONC ls]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF NATU
+1 TYPE P
+1 TITL Naturalization
+1 ABBR Naturalization
+1 SENT [person] was naturalized< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the naturalization of [person]< [Date]>< [PlaceD
+3 CONC etails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF EMIG
+1 TYPE P
+1 TITL Emigration
+1 ABBR Emigration
+1 SENT [person] emigrated< [Date]>< from [Place:plain]>< [PlaceDetails]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the emigration of [person]< [Date]>< [PlaceDetai
+3 CONC ls]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF IMMI
+1 TYPE P
+1 TITL Immigration
+1 ABBR Immigration
+1 SENT [person] immigrated< [Date]>< to [Place:plain]>< [PlaceDetails]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the immigration of [person]< [Date]>< [PlaceDeta
+3 CONC ils]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF CENS
+1 TYPE P
+1 TITL Census
+1 ABBR Census
+1 SENT [person] appeared in the census< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] appeared in the household of [person] in the census< [Date
+3 CONC ]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF PROB
+1 TYPE P
+1 TITL Probate
+1 ABBR Probate
+1 SENT [person] had [person:hisher] estate probated< [Date]>< [PlaceDetails]>< [
+2 CONC Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the probate of [person]< [Date]>< [PlaceDetails]
+3 CONC >< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF WILL
+1 TYPE P
+1 TITL Will
+1 ABBR Will
+1 SENT [person] signed a will< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the will of [person]< [Date]>< [PlaceDetails]>< [
+3 CONC Place]>.
+1 ROLE Heir
+2 SENT [ThisPerson] was named an heir in the will of [person]< [Date]>< [Place
+3 CONC Details]>< [Place]>.
+1 ROLE Executor
+2 SENT [ThisPerson] was named an executor for the will of [person]< [Date]>< [
+3 CONC PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF GRAD
+1 TYPE P
+1 TITL Graduation
+1 ABBR Graduation
+1 SENT [person] graduated< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the graduation of [person]< [Date]>< [PlaceDetai
+3 CONC ls]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF RETI
+1 TYPE P
+1 TITL Retirement
+1 ABBR Retirement
+1 SENT [person] retired< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the retirement of [person]< [Date]>< [PlaceDetai
+3 CONC ls]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF DSCR
+1 TYPE P
+1 TITL Description
+1 ABBR Description
+1 SENT [person] was described as [Desc]< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the appearance of [person] as [Desc]< [Date]>< [
+3 CONC PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF EDUC
+1 TYPE P
+1 TITL Education
+1 ABBR Education
+1 SENT [person] was educated < [Desc]>< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the education of [person]< [Date]>< [PlaceDetail
+3 CONC s]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF NATI
+1 TYPE P
+1 TITL Nationality
+1 ABBR Nationality
+1 SENT [person] was [Desc]< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the nationality of [person] as [Desc]< [Date]>< [
+3 CONC PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF OCCU
+1 TYPE P
+1 TITL Occupation
+1 ABBR Occupation
+1 SENT [date] [person] was [Desc:A]< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the occupation of [person]< [Date]> as [Desc:A]< [
+3 CONC PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF PROP
+1 TYPE P
+1 TITL Property
+1 ABBR Property
+1 SENT [person] owned [Desc]< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the property of [person] as [Desc:A]< [Date]>< [
+3 CONC PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF RELI
+1 TYPE P
+1 TITL Religion
+1 ABBR Religion
+1 SENT [person] was [Desc]< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the religion of [person] as [Desc:A]< [Date]>< [
+3 CONC PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF RESI
+1 TYPE P
+1 TITL Residence
+1 ABBR Residence
+1 SENT [person] lived< [Desc]>< [PlaceDetails]>< [Place]>< [Date]>.
+1 ROLE Witness
+2 SENT [ThisPerson] lived in the residence of [person] < [PlaceDetails]>< [Pla
+3 CONC ce]>< [Date]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF SSN
+1 TYPE P
+1 TITL Soc Sec No
+1 ABBR SSN
+1 SENT [person] had Social Security Number [Desc].
+1 PLAC N
+1 DATE N
+1 DESC Y
+0 _EVDEF BAPL
+1 TYPE P
+1 TITL LDS Baptism
+1 ABBR LDS Bapt
+1 SENT [person] was baptized into the LDS Church< [Date]>< [PlaceDetails]>< [P
+2 CONC lace]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the baptism of [person] into the LDS Church< [Da
+3 CONC te]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF ENDL
+1 TYPE P
+1 TITL LDS Endowment
+1 ABBR LDS Endow
+1 SENT [person] was endowed< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the endowment of [person]< [Date]>< [PlaceDetail
+3 CONC s]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF SLGC
+1 TYPE P
+1 TITL LDS Seal to parents
+1 ABBR LDS SealPar
+1 SENT [person] was sealed to [person:hisher] parents< [Date]>< [PlaceDetails]
+2 CONC >< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the sealed to parents of [person]< [Date]>< [Pla
+3 CONC ceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF AFN
+1 TYPE P
+1 TITL Ancestral File Number
+1 ABBR AFN
+1 SENT [person] has Ancestral File Number [Desc].
+1 PLAC N
+1 DATE N
+1 DESC Y
+0 _EVDEF REFN
+1 TYPE P
+1 TITL Reference No
+1 ABBR Ref #
+1 SENT [person] has reference number [Desc].
+1 PLAC N
+1 DATE N
+1 DESC Y
+0 _EVDEF CAST
+1 TYPE P
+1 TITL Caste
+1 ABBR Caste
+1 SENT [person] was associated with [Desc]< [Date]>< [PlaceDetails]>< [Place]>
+2 CONC .
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the associated with [Desc] of [person]< [Date]>< [
+3 CONC PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF TITL
+1 TYPE P
+1 TITL Title (Nobility)
+1 ABBR Title
+1 SENT [person] held the title of [Desc]< [Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF CONL
+1 TYPE P
+1 TITL LDS Confirmation
+1 ABBR LDS Conf
+1 SENT [person] was confirmed a member of the LDS Church< [Date]>< [PlaceDetai
+2 CONC ls]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the confirmation of [person] as a member of the L
+3 CONC DS Church< [Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF WAC
+1 TYPE P
+1 TITL LDS Initiatory
+1 ABBR LDS Init
+1 SENT [person] received LDS initiatory< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the LDS initiatory of [person]< [Date]>< [PlaceD
+3 CONC etails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF MARR
+1 TYPE F
+1 TITL Marriage
+1 ABBR Marriage
+1 SENT [couple] <#Couple#was|were> married< [Date]>< [PlaceDetails]>< [Place]>
+2 CONC .
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the marriage of [couple]< [Date]>< [PlaceDetails
+3 CONC ]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF ANUL
+1 TYPE F
+1 TITL Annulment
+1 ABBR Annulment
+1 SENT [couple] had their marriage annulled< [Date]>< [PlaceDetails]>< [Place]
+2 CONC >.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the annulment of the marriage of [couple]< [Date
+3 CONC ]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF DIV
+1 TYPE F
+1 TITL Divorce
+1 ABBR Divorce
+1 SENT [couple] <#Couple#was|were> divorced< [Date]>< [PlaceDetails]>< [Place]
+2 CONC >.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the divorce of [couple]< [Date]>< [PlaceDetails]
+3 CONC >< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF DIVF
+1 TYPE F
+1 TITL Divorce filed
+1 ABBR Div. filed
+1 SENT [couple] filed for divorce< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the divorce filing of [couple]< [Date]>< [PlaceD
+3 CONC etails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF ENGA
+1 TYPE F
+1 TITL Engagement
+1 ABBR Engagement
+1 SENT [couple] <#Couple#was|were> engaged< [Date]>< [PlaceDetails]>< [Place]>
+2 CONC .
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the engagement of [couple]< [Date]>< [PlaceDetai
+3 CONC ls]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF MARB
+1 TYPE F
+1 TITL Marriage Bann
+1 ABBR Marr Bann
+1 SENT [couple] had marriage banns published< [Date]>< [PlaceDetails]>< [Place
+2 CONC ]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the publishing of the marriage banns of [couple]
+3 CONC <[Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF MARC
+1 TYPE F
+1 TITL Marriage Contract
+1 ABBR Marr Contract
+1 SENT [couple] signed a marriage contract< [Date]>< [PlaceDetails]>< [Place]>
+2 CONC .
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the marriage contract of [couple]< [Date]>< [Pla
+3 CONC ceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF MARL
+1 TYPE F
+1 TITL Marriage License
+1 ABBR Marr Lic
+1 SENT [couple] obtained a marriage license< [Date]>< [PlaceDetails]>< [Place]
+2 CONC >.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the obtaining of the marriage license by [couple
+3 CONC ]< [Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF MARS
+1 TYPE F
+1 TITL Marriage Settlement
+1 ABBR Marr Settlement
+1 SENT [couple] obtained a marriage settlement< [Date]>< [PlaceDetails]>< [Pla
+2 CONC ce]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the marriage settlement of [couple]< [Date]>< [P
+3 CONC laceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF SLGS
+1 TYPE F
+1 TITL LDS Seal to spouse
+1 ABBR LDS SealSp
+1 SENT [couple] were sealed together< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the sealing of [couple]< [Date]>< [PlaceDetails]
+3 CONC >< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF RESI
+1 TYPE F
+1 TITL Residence (family)
+1 ABBR Residence (fam)
+1 SENT [couple] lived < [Desc]>< [PlaceDetails]>< [Place]>< [Date]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF CENS
+1 TYPE F
+1 TITL Census (family)
+1 ABBR Census (fam)
+1 SENT [couple] appeared in the census< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] appeared in the census in the household of [couple]< [Date
+3 CONC ]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF Degree
+1 TYPE P
+1 TITL Degree
+1 ABBR Degree
+1 SENT [person] received a< [desc]> degree< [Date]>< [PlaceDetails]>< [Place]>
+2 CONC .
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the degree of [person]< [Date]>< [PlaceDetails]>
+3 CONC < [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Military
+1 TYPE P
+1 TITL Military
+1 ABBR Military
+1 SENT [person] served in the military< [Desc]>< [Date]>< [PlaceDetails]>< [Pl
+2 CONC ace]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the military service of [person]< [Date]>< [Plac
+3 CONC eDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Mission
+1 TYPE P
+1 TITL Mission
+1 ABBR Mission
+1 SENT [person] served a mission< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the mission of [person]< [Date]>< [PlaceDetails]
+3 CONC >< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Stillborn
+1 TYPE P
+1 TITL Stillborn
+1 ABBR Stillborn
+1 SENT [person] was stillborn< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the stillbirth of [person]< [Date]>< [PlaceDetai
+3 CONC ls]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF Illness
+1 TYPE P
+1 TITL Illness
+1 ABBR Illness
+1 SENT [person] was ill< with [Desc]>< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the illness of [person] with [Desc]< [Date]>< [P
+3 CONC laceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Living
+1 TYPE P
+1 TITL Living
+1 ABBR Living
+1 SENT [person] was living< [Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF Elected
+1 TYPE P
+1 TITL Election
+1 ABBR Elected
+1 SENT [person] was elected< as [Desc]>< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the election of [person] as [Desc]< [Date]>< [Pl
+3 CONC aceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Excomm
+1 TYPE P
+1 TITL Excommunication
+1 ABBR Excomm
+1 SENT [person] was excommunicated< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the excommunication of [person]< [Date]>< [Place
+3 CONC Details]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF Namesake
+1 TYPE P
+1 TITL Namesake
+1 ABBR Namesake
+1 SENT [person] was named after [Desc]< [Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Separation
+1 TYPE F
+1 TITL Separation
+1 ABBR Separation
+1 SENT [couple] were separated< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [ThisPerson] witnessed the separation of [couple]< [Date]>< [PlaceDetai
+3 CONC ls]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC N
+0 _EVDEF Alt. Name
+1 TYPE P
+1 TITL Alternate name
+1 ABBR Alt. Name
+1 SENT [person] was also known as [Desc]< [Date]>.
+1 PLAC N
+1 DATE Y
+1 DESC N
+0 _EVDEF _DNA
+1 TYPE P
+1 TITL DNA test
+1 ABBR DNA
+1 SENT [person] had a DNA test performed< [Date]>.
+1 PLAC N
+1 DATE Y
+1 DESC N
+0 _EVDEF Association
+1 TYPE P
+1 TITL Association
+1 ABBR Association
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Misc
+1 TYPE P
+1 TITL Miscellaneous
+1 ABBR Misc
+1 SENT [person]< [Desc]>< [Date]>< [PlaceDetails]>< [Place]>.
+1 ROLE Witness
+2 SENT [person]< [Desc]>< [Date]>< [PlaceDetails]>< [Place]>.
+1 PLAC Y
+1 DATE Y
+1 DESC Y
+0 _EVDEF Cref
+1 TYPE P
+1 TITL Cross Reference
+1 ABBR Cref
+1 SENT [person] also appears in record <[Desc]>.
+1 PLAC N
+1 DATE N
+1 DESC Y
+0 TRLR

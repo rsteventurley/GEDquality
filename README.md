@@ -28,7 +28,7 @@ A comprehensive library for handling genealogical data models, including date pa
 #### Usage
 
 ```javascript
-const { DateModel, EventModel, NameModel, PersonModel } = require('./DataModel');
+const { DateModel, EventModel, NameModel, PersonModel, FamilyModel, EntryModel } = require('./DataModel');
 
 // DateModel examples
 const date = new DateModel();
@@ -103,6 +103,67 @@ const person7 = new PersonModel(new NameModel('Different', 'Death'), personBirth
 // person7 has birth but no death, person3 has both birth and death
 console.log(person3.eventsMatch(person7)); // false - events don't all match
 
+// FamilyModel examples
+const emptyFamily = new FamilyModel(); // Empty family
+const marriageDate = new DateModel();
+marriageDate.parseDateString('1875-06-15');
+const marriageEvent = new EventModel(marriageDate, 'St. Mary\'s Church, Boston');
+const children = [3, 4, 5]; // Person IDs for children
+
+const completeFamily = new FamilyModel(1, 2, children, marriageEvent); // husband, wife, children, marriage
+console.log(completeFamily.toString()); // "Husband: 1, Wife: 2, Children: 3 (3, 4, 5), Married: Normal 15.06.1875 St. Mary's Church, Boston"
+console.log(completeFamily.getMarriagePlace()); // "St. Mary's Church, Boston"
+console.log(completeFamily.hasExactMarriageDate()); // true
+
+// Fill missing marriage place for exact dates
+const marriageDateOnly = new DateModel();
+marriageDateOnly.parseDateString('1880-09-10');
+const marriageWithoutPlace = new EventModel(marriageDateOnly, ''); // No place
+const familyToFill = new FamilyModel(10, 11, [12], marriageWithoutPlace);
+
+console.log('Before fillMarriage:', familyToFill.getMarriage().toString()); // "Normal 10.09.1880"
+familyToFill.fillMarriage('Trinity Church, New York');
+console.log('After fillMarriage:', familyToFill.getMarriage().toString()); // "Normal 10.09.1880 Trinity Church, New York"
+
+// EntryModel examples - genealogical entries with people, families, and relationships
+const entry = new EntryModel('entry-001');
+
+// Add people to the entry
+const father = new PersonModel(new NameModel('John', 'Smith'));
+const mother = new PersonModel(new NameModel('Mary', 'Smith'));
+const child = new PersonModel(new NameModel('Tom', 'Smith'));
+
+entry.addPerson(1, 'john-smith-001', father);
+entry.addPerson(2, 'mary-smith-002', mother);
+entry.addPerson(3, 'tom-smith-003', child);
+
+// Add family relationships
+const family = new FamilyModel(1, 2, [3]); // John, Mary, Tom
+entry.addFamily(1, family);
+
+console.log(entry.toString()); // "<Entry: entry-001 - 3 people, 1 families>"
+
+// Cross-reference people by UID
+console.log(entry.crossReference('john-smith-001')); // 1
+console.log(entry.crossReference('not-found')); // -1
+
+// Get relationship strings
+console.log(entry.getRelationship(1)); // "0" (trunk person)
+console.log(entry.getRelationship(2)); // "0W" (wife of trunk)
+console.log(entry.getRelationship(3)); // "0C" (child of trunk)
+
+// Add unrelated family (separate tree)
+const uncle = new PersonModel(new NameModel('Bob', 'Jones'));
+const aunt = new PersonModel(new NameModel('Sue', 'Jones'));
+entry.addPerson(4, 'bob-jones-004', uncle);
+entry.addPerson(5, 'sue-jones-005', aunt);
+
+const unrelatedFamily = new FamilyModel(4, 5, []);
+entry.addFamily(2, unrelatedFamily);
+
+console.log(entry.getRelationship(4)); // "1" (trunk of second tree)
+console.log(entry.getRelationship(5)); // "1W" (wife in second tree)
+
 // Using setter methods (still available)
 const event = new EventModel();
 event.setDate('ABT 1850-06-15'); // This uses parseDateString internally
@@ -134,7 +195,14 @@ console.log('After fillEvents:', personToFill.birth.toString()); // "Normal 10.0
   - `eventMatch(otherPerson)`: Returns true if at least one non-empty event matches between two PersonModel instances
   - `eventsMatch(otherPerson)`: Returns true if all events are either empty or match exactly between two PersonModel instances
   - `fillEvents(place)`: Sets the place for events that have exact dates but no place information
-- Future classes may include: PlaceModel, SourceModel, FamilyModel
+- **FamilyModel**: Family modeling with husband, wife, children, and marriage information
+  - `fillMarriage(place)`: Sets the place for marriage event if it has an exact date but no place information
+- **EntryModel**: Complete genealogical entry management with people, families, and relationship calculations
+  - `addPerson(personId, uid, person)`: Adds a person with unique ID and UID checking
+  - `addFamily(familyId, family)`: Adds a family and updates related people's family lists
+  - `crossReference(uid)`: Returns person ID for a given UID, or -1 if not found
+  - `getRelationship(personId)`: Returns relationship string with automatic tree calculation
+- Future classes may include: PlaceModel, SourceModel
 
 #### Testing
 
@@ -148,4 +216,6 @@ node DataModel/test-PersonModel.js
 node DataModel/test-PersonModel-eventMatch.js
 node DataModel/test-PersonModel-eventsMatch.js
 node DataModel/test-PersonModel-fillEvents.js
+node DataModel/test-FamilyModel.js
+node DataModel/test-EntryModel.js
 ```

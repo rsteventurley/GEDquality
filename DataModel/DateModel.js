@@ -140,6 +140,142 @@ class DateModel {
     }
 
     /**
+     * Parse GEDCOM date format (DD MMM YYYY) with optional modifiers
+     * Supports formats like "10 SEP 1802", "ABT 1850", "BEF 1900", etc.
+     * @param {string} dateString - The date string to parse in GEDCOM format
+     * @throws {Error} If the date format is invalid or date values are out of range
+     */
+    parseGedcomDate(dateString) {
+        if (!dateString || typeof dateString !== 'string') {
+            throw new Error('Date string is required and must be a string');
+        }
+
+        this.originalString = dateString.trim();
+        const normalizedDate = this.originalString.toUpperCase().trim();
+
+        // Reset all properties
+        this.day = null;
+        this.month = null;
+        this.year = null;
+        this.isRange = false;
+        this.startDate = null;
+        this.endDate = null;
+        this.isAbout = false;
+        this.isApproximate = false;
+        this.isBefore = false;
+        this.isAfter = false;
+
+        // Check for ABT modifier
+        if (normalizedDate.startsWith('ABT ')) {
+            this.isAbout = true;
+            this.isApproximate = true;
+            const cleanDate = normalizedDate.substring(4).trim();
+            this._parseSingleGedcomDate(cleanDate);
+        }
+        // Check for BEF modifier
+        else if (normalizedDate.startsWith('BEF ')) {
+            this.isBefore = true;
+            const cleanDate = normalizedDate.substring(4).trim();
+            this._parseSingleGedcomDate(cleanDate);
+        }
+        // Check for AFT modifier
+        else if (normalizedDate.startsWith('AFT ')) {
+            this.isAfter = true;
+            const cleanDate = normalizedDate.substring(4).trim();
+            this._parseSingleGedcomDate(cleanDate);
+        }
+        // Check for BET range
+        else if (normalizedDate.startsWith('BET ')) {
+            this.isRange = true;
+            const rangeContent = normalizedDate.substring(4).trim();
+            const andIndex = rangeContent.indexOf(' AND ');
+            
+            if (andIndex === -1) {
+                throw new Error('Range format must be "BET DD MMM YYYY AND DD MMM YYYY"');
+            }
+            
+            const startDateStr = rangeContent.substring(0, andIndex).trim();
+            const endDateStr = rangeContent.substring(andIndex + 5).trim();
+            
+            this.startDate = new DateModel();
+            this.startDate.parseGedcomDate(startDateStr);
+            
+            this.endDate = new DateModel();
+            this.endDate.parseGedcomDate(endDateStr);
+        }
+        // Single date
+        else {
+            this._parseSingleGedcomDate(normalizedDate);
+        }
+    }
+
+    /**
+     * Parse a single GEDCOM date (DD MMM YYYY)
+     * @private
+     * @param {string} dateString - The clean date string in GEDCOM format
+     * @throws {Error} If the date format is invalid or values are out of range
+     */
+    _parseSingleGedcomDate(dateString) {
+        // Month name mapping
+        const monthNames = {
+            'JAN': 1, 'FEB': 2, 'MAR': 3, 'APR': 4, 'MAY': 5, 'JUN': 6,
+            'JUL': 7, 'AUG': 8, 'SEP': 9, 'OCT': 10, 'NOV': 11, 'DEC': 12
+        };
+
+        // Match DD MMM YYYY format (e.g., "10 SEP 1802")
+        const gedcomMatch = dateString.match(/^(\d{1,2})\s+([A-Z]{3})\s+(\d{4})$/);
+        
+        if (gedcomMatch) {
+            const day = parseInt(gedcomMatch[1], 10);
+            const monthName = gedcomMatch[2];
+            const year = parseInt(gedcomMatch[3], 10);
+            
+            const month = monthNames[monthName];
+            if (!month) {
+                throw new Error(`Invalid month name: ${monthName}`);
+            }
+            
+            // Validate year range
+            if (year < 1400 || year > 2100) {
+                throw new Error(`Year must be between 1400 and 2100, got ${year}`);
+            }
+            
+            // Validate month range
+            if (month < 1 || month > 12) {
+                throw new Error(`Month must be between 1 and 12, got ${month}`);
+            }
+            
+            // Validate day based on month and year
+            const daysInMonth = this._getDaysInMonth(month, year);
+            if (day < 1 || day > daysInMonth) {
+                throw new Error(`Day must be between 1 and ${daysInMonth} for month ${month}, got ${day}`);
+            }
+            
+            this.year = year;
+            this.month = month;
+            this.day = day;
+        }
+        // Match YYYY only format (e.g., "1850")
+        else {
+            const yearMatch = dateString.match(/^(\d{4})$/);
+            if (yearMatch) {
+                const year = parseInt(yearMatch[1], 10);
+                
+                // Validate year range
+                if (year < 1400 || year > 2100) {
+                    throw new Error(`Year must be between 1400 and 2100, got ${year}`);
+                }
+                
+                this.year = year;
+                this.month = null;
+                this.day = null;
+            } else {
+                throw new Error(`Invalid GEDCOM date format: ${dateString}. Expected DD MMM YYYY or YYYY.`);
+            }
+        }
+    }
+
+    /**
      * Get the number of days in a given month and year
      * @private
      * @param {number} month - Month (1-12)

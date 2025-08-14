@@ -18,10 +18,11 @@ class PersonModel {
      * @param {EventModel} [christening] - Optional EventModel for the person's christening
      * @param {EventModel} [burial] - Optional EventModel for the person's burial
      * @param {Array<number>} [families] - Optional array of family IDs
-     * @param {Array<string>} [references] - Optional array of reference strings
-     * @param {string} [source] - Optional source string
+     * @param {Array<string>} [references] - Optional array of reference strings (cross-references)
+     * @param {string} [source] - Optional source string (entry id)
+     * @param {string} [uid] - Optional unique identifier string
      */
-    constructor(name, birth, death, christening, burial, families, references, source) {
+    constructor(name, birth, death, christening, burial, families, references, source, uid) {
         this.name = name ? name.clone() : new NameModel();
         this.birth = birth ? birth.clone() : new EventModel();
         this.death = death ? death.clone() : new EventModel();
@@ -30,6 +31,7 @@ class PersonModel {
         this.families = families ? [...families] : [];
         this.references = references ? [...references] : [];
         this.source = source || '';
+        this.uid = uid || '';
     }
 
     /**
@@ -44,7 +46,8 @@ class PersonModel {
                this.burial.isEmpty() && 
                this.families.length === 0 && 
                this.references.length === 0 && 
-               this.source === '';
+               this.source === '' &&
+               this.uid === '';
     }
 
     /**
@@ -59,7 +62,8 @@ class PersonModel {
                this.burial.isValid() || 
                this.families.length > 0 || 
                this.references.length > 0 || 
-               this.source !== '';
+               this.source !== '' ||
+               this.uid !== '';
     }
 
     /**
@@ -157,6 +161,14 @@ class PersonModel {
     }
 
     /**
+     * Set the person's uid
+     * @param {string} uid - The unique identifier string
+     */
+    setUid(uid) {
+        this.uid = uid || '';
+    }
+
+    /**
      * Get the person's name
      * @returns {NameModel} The person's name
      */
@@ -221,6 +233,14 @@ class PersonModel {
     }
 
     /**
+     * Get the person's uid
+     * @returns {string} The unique identifier string
+     */
+    getUid() {
+        return this.uid;
+    }
+
+    /**
      * Create a copy of this PersonModel
      * @returns {PersonModel} A new PersonModel instance with the same data
      */
@@ -233,7 +253,8 @@ class PersonModel {
             this.burial, 
             this.families, 
             this.references, 
-            this.source
+            this.source,
+            this.uid
         );
     }
 
