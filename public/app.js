@@ -6,11 +6,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const form = document.getElementById('dataForm');
-    const locationSelect = document.getElementById('location');
-    const pageInput = document.getElementById('page');
-    const llmSelect = document.getElementById('llm');
     const rateBtn = document.getElementById('rateBtn');
-    const configBtn = document.getElementById('configBtn');
     const helpBtn = document.getElementById('helpBtn');
     const saveBtn = document.getElementById('saveBtn');
     const btnText = document.querySelector('.btn-text');
@@ -19,138 +15,144 @@ document.addEventListener('DOMContentLoaded', function() {
     const errorDiv = document.getElementById('error');
     const errorContent = document.getElementById('errorContent');
 
+    // File upload elements
+    const gedcomFile = document.getElementById('gedcomFile');
+    const xmlFile = document.getElementById('xmlFile');
+    const gedcomUploadBtn = document.getElementById('gedcomUploadBtn');
+    const xmlUploadBtn = document.getElementById('xmlUploadBtn');
+    const gedcomFileName = document.getElementById('gedcomFileName');
+    const xmlFileName = document.getElementById('xmlFileName');
+
     // Modal elements
-    const configModal = document.getElementById('configModal');
     const helpModal = document.getElementById('helpModal');
     const saveFileModal = document.getElementById('saveFileModal');
-    const overwriteModal = document.getElementById('overwriteModal');
-    const closeConfigModal = document.getElementById('closeConfigModal');
     const closeHelpModal = document.getElementById('closeHelpModal');
     const closeSaveFileModal = document.getElementById('closeSaveFileModal');
-    const closeOverwriteModal = document.getElementById('closeOverwriteModal');
-    const configOk = document.getElementById('configOk');
-    const configCancel = document.getElementById('configCancel');
     const closeHelp = document.getElementById('closeHelp');
-    const groundTruthDir = document.getElementById('groundTruthDir');
-    const llmXmlDir = document.getElementById('llmXmlDir');
-    const outputDir = document.getElementById('outputDir');
     const fileName = document.getElementById('fileName');
     const saveFileOk = document.getElementById('saveFileOk');
     const saveFileCancel = document.getElementById('saveFileCancel');
-    const overwriteYes = document.getElementById('overwriteYes');
-    const overwriteNo = document.getElementById('overwriteNo');
 
-    // Configuration storage
-    let currentConfig = {
-        groundTruthDir: '',
-        llmXmlDir: '',
-        outputDir: ''
+    // File upload tracking
+    let uploadedFiles = {
+        gedcom: null,
+        xml: null
     };
 
-    // Cookie functions
-    function setCookie(name, value, days = 30) {
-        const expires = new Date();
-        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-        document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
-    }
-
-    function getCookie(name) {
-        const nameEQ = name + "=";
-        const ca = document.cookie.split(';');
-        for (let i = 0; i < ca.length; i++) {
-            let c = ca[i];
-            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    // Extract page number from filename
+    function extractPageNumber(filename) {
+        // Match pattern: basename.###.extension where ### is the page number
+        const match = filename.match(/^(.+)\.(\d{3})\.(ged|xml)$/i);
+        if (match) {
+            return {
+                basename: match[1],
+                pageNumber: match[2],
+                extension: match[3].toLowerCase()
+            };
         }
         return null;
     }
 
-    // Load configuration from cookies
-    function loadConfiguration() {
-        const savedGroundTruth = getCookie('groundTruthDir');
-        const savedLlmXml = getCookie('llmXmlDir');
-        const savedOutput = getCookie('outputDir');
-        
-        if (savedGroundTruth) {
-            currentConfig.groundTruthDir = savedGroundTruth;
-            groundTruthDir.value = savedGroundTruth;
+    // Validate that GEDCOM and XML files have matching page numbers
+    function validatePageNumbers() {
+        if (!uploadedFiles.gedcom || !uploadedFiles.xml) {
+            return { isValid: true, message: '' }; // Can't validate until both files are uploaded
         }
-        
-        if (savedLlmXml) {
-            currentConfig.llmXmlDir = savedLlmXml;
-            llmXmlDir.value = savedLlmXml;
+
+        const gedcomInfo = extractPageNumber(uploadedFiles.gedcom.originalName);
+        const xmlInfo = extractPageNumber(uploadedFiles.xml.originalName);
+
+        if (!gedcomInfo) {
+            return { 
+                isValid: false, 
+                message: `GEDCOM filename "${uploadedFiles.gedcom.originalName}" must follow pattern: basename.###.ged\n\nExample: Tannenkirch.000.ged` 
+            };
         }
+
+        if (!xmlInfo) {
+            return { 
+                isValid: false, 
+                message: `XML filename "${uploadedFiles.xml.originalName}" must follow pattern: basename.###.xml\n\nExample: Tannenkirch.000.xml` 
+            };
+        }
+
+        if (gedcomInfo.pageNumber !== xmlInfo.pageNumber) {
+            return { 
+                isValid: false, 
+                message: `Page number mismatch:\n• GEDCOM: ${uploadedFiles.gedcom.originalName} (page ${gedcomInfo.pageNumber})\n• XML: ${uploadedFiles.xml.originalName} (page ${xmlInfo.pageNumber})\n\nBoth files must reference the same page number.` 
+            };
+        }
+
+        if (gedcomInfo.basename.toLowerCase() !== xmlInfo.basename.toLowerCase()) {
+            return { 
+                isValid: false, 
+                message: `Base name mismatch:\n• GEDCOM: "${gedcomInfo.basename}"\n• XML: "${xmlInfo.basename}"\n\nBoth files must have the same base name.` 
+            };
+        }
+
+        return { 
+            isValid: true, 
+            message: '', 
+            pageNumber: gedcomInfo.pageNumber,
+            basename: gedcomInfo.basename 
+        };
+    }
+
+    // File upload functions
+    async function uploadFile(file, endpoint) {
+        const formData = new FormData();
+        formData.append(endpoint === '/api/upload-gedcom' ? 'gedcom' : 'xml', file);
         
-        if (savedOutput) {
-            currentConfig.outputDir = savedOutput;
-            outputDir.value = savedOutput;
+        try {
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                body: formData
+            });
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Upload failed');
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('Upload error:', error);
+            throw error;
         }
     }
 
-    // Save configuration to cookies
-    function saveConfiguration() {
-        setCookie('groundTruthDir', currentConfig.groundTruthDir);
-        setCookie('llmXmlDir', currentConfig.llmXmlDir);
-        setCookie('outputDir', currentConfig.outputDir);
-    }
-
-    // Load form values from cookies
-    function loadFormValues() {
-        const savedLocation = getCookie('selectedLocation');
-        const savedPage = getCookie('selectedPage');
-        const savedLlm = getCookie('selectedLlm');
-        
-        if (savedLocation) {
-            locationSelect.value = savedLocation;
-        }
-        
-        if (savedPage) {
-            pageInput.value = savedPage;
-        }
-        
-        if (savedLlm) {
-            llmSelect.value = savedLlm;
-        }
-    }
-
-    // Save form values to cookies
+    // Initialize form
+    function initializeForm() {
+        updateFormValidation();
+    }    // Save form values to localStorage
     function saveFormValues() {
-        setCookie('selectedLocation', locationSelect.value);
-        setCookie('selectedPage', pageInput.value);
-        setCookie('selectedLlm', llmSelect.value);
+        localStorage.setItem('selectedLocation', locationSelect.value);
     }
 
     // Form validation
     function validateForm() {
-        const location = locationSelect.value.trim();
-        const page = pageInput.value.trim();
-        const llm = llmSelect.value.trim();
-        
         let isValid = true;
         let errors = [];
 
-        // Validate location
-        if (!location) {
-            errors.push('Please select a location');
+        // Validate file uploads
+        if (!uploadedFiles.gedcom) {
+            errors.push('Please upload a GEDCOM file');
             isValid = false;
         }
 
-        // Validate page number
-        if (!page) {
-            errors.push('Please enter a page number');
+        if (!uploadedFiles.xml) {
+            errors.push('Please upload an XML file');
             isValid = false;
-        } else {
-            const pageNumber = parseInt(page);
-            if (isNaN(pageNumber) || pageNumber < 0 || !Number.isInteger(parseFloat(page))) {
-                errors.push('Page must be a non-negative integer (0 or greater)');
+        }
+
+        // Validate page numbers if both files are uploaded
+        if (uploadedFiles.gedcom && uploadedFiles.xml) {
+            const pageValidation = validatePageNumbers();
+            if (!pageValidation.isValid) {
+                errors.push(pageValidation.message);
                 isValid = false;
             }
-        }
-
-        // Validate LLM selection
-        if (!llm) {
-            errors.push('Please select an LLM');
-            isValid = false;
         }
 
         return { isValid, errors };
@@ -170,18 +172,175 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Show error message
+    // Show error message in prominent overlay
     function showError(message) {
+        // Remove any existing error overlay
+        hideError();
+        
+        // Create error overlay
+        const errorOverlay = document.createElement('div');
+        errorOverlay.id = 'errorOverlay';
+        errorOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        `;
+        
+        // Create error dialog
+        const errorDialog = document.createElement('div');
+        errorDialog.style.cssText = `
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            position: relative;
+            animation: errorSlideIn 0.3s ease-out;
+        `;
+        
+        // Create error content
+        const errorContent = document.createElement('div');
+        errorContent.style.cssText = `
+            color: #dc2626;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        `;
         errorContent.textContent = message;
-        errorDiv.style.display = 'block';
+        
+        // Create close button
+        const closeButton = document.createElement('button');
+        closeButton.innerHTML = '✕';
+        closeButton.style.cssText = `
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #dc2626;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        `;
+        
+        closeButton.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#fca5a5';
+        });
+        
+        closeButton.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = 'transparent';
+        });
+        
+        closeButton.addEventListener('click', hideError);
+        
+        // Create OK button
+        const okButton = document.createElement('button');
+        okButton.textContent = 'OK';
+        okButton.style.cssText = `
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 16px;
+            transition: background-color 0.2s;
+        `;
+        
+        okButton.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#b91c1c';
+        });
+        
+        okButton.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '#dc2626';
+        });
+        
+        okButton.addEventListener('click', hideError);
+        
+        // Assemble dialog
+        errorDialog.appendChild(closeButton);
+        errorDialog.appendChild(errorContent);
+        errorDialog.appendChild(okButton);
+        errorOverlay.appendChild(errorDialog);
+        
+        // Add animation keyframes if not already added
+        if (!document.querySelector('#errorAnimations')) {
+            const style = document.createElement('style');
+            style.id = 'errorAnimations';
+            style.textContent = `
+                @keyframes errorSlideIn {
+                    from {
+                        opacity: 0;
+                        transform: scale(0.9) translateY(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: scale(1) translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Add to document
+        document.body.appendChild(errorOverlay);
+        
+        // Close on escape key
+        function handleEscape(e) {
+            if (e.key === 'Escape') {
+                hideError();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        }
+        document.addEventListener('keydown', handleEscape);
+        
+        // Close on backdrop click
+        errorOverlay.addEventListener('click', function(e) {
+            if (e.target === errorOverlay) {
+                hideError();
+            }
+        });
+        
+        // Auto-hide after 10 seconds for very long messages
         setTimeout(() => {
-            errorDiv.style.display = 'none';
-        }, 5000);
+            if (document.getElementById('errorOverlay')) {
+                hideError();
+            }
+        }, 10000);
     }
 
     // Hide error message
     function hideError() {
-        errorDiv.style.display = 'none';
+        const existingOverlay = document.getElementById('errorOverlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        
+        // Also hide the old error div if it exists
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
     }
 
     // Show loading state
@@ -199,6 +358,30 @@ document.addEventListener('DOMContentLoaded', function() {
         rateBtn.disabled = false;
         rateBtn.style.opacity = '1';
         updateFormValidation();
+    }
+
+    // Show success message
+    function showSuccess(message) {
+        const successDiv = document.createElement('div');
+        successDiv.className = 'success-message';
+        successDiv.textContent = message;
+        successDiv.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        `;
+        
+        document.body.appendChild(successDiv);
+        
+        setTimeout(() => {
+            document.body.removeChild(successDiv);
+        }, 3000);
     }
 
     // Show modal
@@ -225,11 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const formData = {
-            location: locationSelect.value,
-            page: pageInput.value,
-            llm: llmSelect.value,
-            groundTruthDir: currentConfig.groundTruthDir,
-            llmXmlDir: currentConfig.llmXmlDir
+            // Form data for API - files are already uploaded
         };
 
         showLoading();
@@ -260,38 +439,115 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Configuration modal handlers
-    configBtn.addEventListener('click', function() {
-        // Load current values into modal
-        groundTruthDir.value = currentConfig.groundTruthDir;
-        llmXmlDir.value = currentConfig.llmXmlDir;
-        outputDir.value = currentConfig.outputDir;
-        showModal(configModal);
+    // File upload handlers
+    gedcomUploadBtn.addEventListener('click', function() {
+        gedcomFile.click();
     });
 
-    configOk.addEventListener('click', function() {
-        // Save configuration
-        currentConfig.groundTruthDir = groundTruthDir.value.trim();
-        currentConfig.llmXmlDir = llmXmlDir.value.trim();
-        currentConfig.outputDir = outputDir.value.trim();
-        saveConfiguration();
-        hideModal(configModal);
-        
-        // Show success message in results area
-        const timestamp = new Date().toLocaleString();
-        resultsArea.value = `Configuration Updated - ${timestamp}\n\nGround Truth Directory: ${currentConfig.groundTruthDir || 'Not set'}\nLLM XML Directory: ${currentConfig.llmXmlDir || 'Not set'}\nOutput Directory: ${currentConfig.outputDir || 'Not set'}\n\nConfiguration saved successfully!`;
+    xmlUploadBtn.addEventListener('click', function() {
+        xmlFile.click();
     });
 
-    configCancel.addEventListener('click', function() {
-        // Revert to saved values
-        groundTruthDir.value = currentConfig.groundTruthDir;
-        llmXmlDir.value = currentConfig.llmXmlDir;
-        outputDir.value = currentConfig.outputDir;
-        hideModal(configModal);
+    gedcomFile.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file extension
+            if (!file.name.toLowerCase().endsWith('.ged')) {
+                showError('❌ Invalid GEDCOM File Extension\n\nGEDCOM files must have a .ged extension.\n\nExample: Tannenkirch.000.ged');
+                e.target.value = ''; // Clear the file input
+                return;
+            }
+
+            // Validate filename format
+            const fileInfo = extractPageNumber(file.name);
+            if (!fileInfo) {
+                showError('❌ Invalid GEDCOM Filename Format\n\nGEDCOM filename must follow the pattern:\nbasename.###.ged\n\nExample: Tannenkirch.000.ged\n(where 000 is the 3-digit page number)');
+                e.target.value = ''; // Clear the file input
+                return;
+            }
+            
+            try {
+                showLoading();
+                const result = await uploadFile(file, '/api/upload-gedcom');
+                uploadedFiles.gedcom = {
+                    originalName: file.name,
+                    serverResponse: result
+                };
+                
+                // Update UI
+                gedcomFileName.textContent = file.name;
+                gedcomUploadBtn.classList.add('file-selected');
+                gedcomUploadBtn.querySelector('.upload-text').textContent = 'GEDCOM File Selected';
+                
+                updateFormValidation();
+                
+                // Check for page number mismatch if XML is already uploaded
+                if (uploadedFiles.xml) {
+                    const pageValidation = validatePageNumbers();
+                    if (!pageValidation.isValid) {
+                        showError('❌ File Mismatch Detected\n\n' + pageValidation.message + '\n\nPlease ensure both files reference the same page and have matching base names.');
+                        // Don't clear the file, but show the error
+                    }
+                }
+                
+                hideLoading();
+                showSuccess(`GEDCOM file "${file.name}" uploaded successfully!`);
+            } catch (error) {
+                hideLoading();
+                showError('Failed to upload GEDCOM file: ' + error.message);
+            }
+        }
     });
 
-    closeConfigModal.addEventListener('click', function() {
-        hideModal(configModal);
+    xmlFile.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // Validate file extension
+            if (!file.name.toLowerCase().endsWith('.xml')) {
+                showError('❌ Invalid XML File Extension\n\nXML files must have a .xml extension.\n\nExample: Tannenkirch.000.xml');
+                e.target.value = ''; // Clear the file input
+                return;
+            }
+
+            // Validate filename format
+            const fileInfo = extractPageNumber(file.name);
+            if (!fileInfo) {
+                showError('❌ Invalid XML Filename Format\n\nXML filename must follow the pattern:\nbasename.###.xml\n\nExample: Tannenkirch.000.xml\n(where 000 is the 3-digit page number)');
+                e.target.value = ''; // Clear the file input
+                return;
+            }
+            
+            try {
+                showLoading();
+                const result = await uploadFile(file, '/api/upload-xml');
+                uploadedFiles.xml = {
+                    originalName: file.name,
+                    serverResponse: result
+                };
+                
+                // Update UI
+                xmlFileName.textContent = file.name;
+                xmlUploadBtn.classList.add('file-selected');
+                xmlUploadBtn.querySelector('.upload-text').textContent = 'XML File Selected';
+                
+                updateFormValidation();
+                
+                // Check for page number mismatch if GEDCOM is already uploaded
+                if (uploadedFiles.gedcom) {
+                    const pageValidation = validatePageNumbers();
+                    if (!pageValidation.isValid) {
+                        showError('❌ File Mismatch Detected\n\n' + pageValidation.message + '\n\nPlease ensure both files reference the same page and have matching base names.');
+                        // Don't clear the file, but show the error
+                    }
+                }
+                
+                hideLoading();
+                showSuccess(`XML file "${file.name}" uploaded successfully!`);
+            } catch (error) {
+                hideLoading();
+                showError('Failed to upload XML file: ' + error.message);
+            }
+        }
     });
 
     // Help modal handlers
@@ -314,14 +570,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        if (!currentConfig.outputDir) {
-            showError('Output directory not configured. Please configure the output directory first.');
-            return;
+        // Generate default filename with page number
+        const pageValidation = validatePageNumbers();
+        let defaultFilename = 'LLMquality_results';
+        
+        if (pageValidation.isValid && pageValidation.pageNumber) {
+            defaultFilename = `${pageValidation.basename}.${pageValidation.pageNumber}_results`;
+        } else {
+            // Fallback to timestamp-based filename
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
+            defaultFilename = `llm-quality-results-${timestamp}`;
         }
         
-        // Generate default filename
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').substring(0, 19);
-        fileName.value = `llm-quality-results-${timestamp}.txt`;
+        fileName.value = defaultFilename;
         showModal(saveFileModal);
     });
 
@@ -332,33 +593,26 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Add .txt extension if not present
+        const finalFileName = fileNameValue.endsWith('.txt') ? fileNameValue : fileNameValue + '.txt';
+        
         try {
-            // Check if file exists
-            const checkResponse = await fetch('/api/check-file', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fileName: fileNameValue,
-                    outputDir: currentConfig.outputDir
-                })
-            });
+            // Save to client machine
+            const saved = await saveToClient(finalFileName, resultsArea.value);
             
-            const checkResult = await checkResponse.json();
-            
-            if (checkResult.success && checkResult.exists) {
-                // File exists, show overwrite confirmation
+            if (saved) {
+                // Close modal and show success message
                 hideModal(saveFileModal);
-                document.getElementById('overwriteMessage').textContent = 
-                    `The file "${fileNameValue}" already exists in "${currentConfig.outputDir}". Do you want to overwrite it?`;
-                showModal(overwriteModal);
+                const timestamp = new Date().toLocaleString();
+                const saveMethod = ('showSaveFilePicker' in window) ? 'Saved to chosen location' : 'Downloaded to your computer';
+                resultsArea.value += `\n\n=== FILE SAVED ===\nTimestamp: ${timestamp}\nFile: ${finalFileName}\nStatus: ${saveMethod}\n==================`;
+                resultsArea.scrollTop = resultsArea.scrollHeight;
             } else {
-                // File doesn't exist, save directly
-                await saveFile(fileNameValue, false);
+                // User cancelled save dialog
+                hideModal(saveFileModal);
             }
         } catch (error) {
-            showError('Error checking file: ' + error.message);
+            showError('Failed to save file: ' + error.message);
         }
     });
 
@@ -370,102 +624,88 @@ document.addEventListener('DOMContentLoaded', function() {
         hideModal(saveFileModal);
     });
 
-    // Overwrite confirmation handlers
-    overwriteYes.addEventListener('click', async function() {
-        const fileNameValue = fileName.value.trim();
-        hideModal(overwriteModal);
-        await saveFile(fileNameValue, true);
-    });
-
-    overwriteNo.addEventListener('click', function() {
-        hideModal(overwriteModal);
-        showModal(saveFileModal); // Go back to save dialog
-    });
-
-    closeOverwriteModal.addEventListener('click', function() {
-        hideModal(overwriteModal);
-        showModal(saveFileModal); // Go back to save dialog
-    });
-
-    // File save function
-    async function saveFile(fileNameValue, overwrite) {
-        try {
-            const response = await fetch('/api/save-file', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fileName: fileNameValue,
-                    content: resultsArea.value,
-                    outputDir: currentConfig.outputDir,
-                    overwrite: overwrite
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                hideModal(saveFileModal);
-                const timestamp = new Date().toLocaleString();
-                resultsArea.value += `\n\n=== FILE SAVED ===\nTimestamp: ${timestamp}\nFile: ${result.filePath}\nStatus: Successfully saved\n==================`;
-                resultsArea.scrollTop = resultsArea.scrollHeight;
-            } else {
-                throw new Error(result.error || 'Failed to save file');
-            }
-        } catch (error) {
-            showError('Error saving file: ' + error.message);
-        }
-    }
-
     // Close modals when clicking outside
     window.addEventListener('click', function(event) {
-        if (event.target === configModal) {
-            hideModal(configModal);
-        }
         if (event.target === helpModal) {
             hideModal(helpModal);
         }
         if (event.target === saveFileModal) {
             hideModal(saveFileModal);
         }
-        if (event.target === overwriteModal) {
-            hideModal(overwriteModal);
-        }
     });
 
     // Real-time validation listeners
     locationSelect.addEventListener('change', updateFormValidation);
-    pageInput.addEventListener('input', updateFormValidation);
-    llmSelect.addEventListener('change', updateFormValidation);
-
-    // Page input validation
-    pageInput.addEventListener('input', function() {
-        const value = this.value;
-        const isValid = value === '' || (Number.isInteger(parseFloat(value)) && parseInt(value) > 0);
-        
-        if (!isValid && value !== '') {
-            this.style.borderColor = '#f56565';
-        } else {
-            this.style.borderColor = '#e2e8f0';
-        }
-        
-        updateFormValidation();
-    });
 
     // Form value change listeners
     locationSelect.addEventListener('change', saveFormValues);
-    pageInput.addEventListener('input', saveFormValues);
-    llmSelect.addEventListener('change', saveFormValues);
+
+    // Save to client machine functionality
+    async function saveToClient(filename, content) {
+        try {
+            // Check if File System Access API is supported (modern browsers)
+            if ('showSaveFilePicker' in window) {
+                // Use File System Access API for better user experience
+                const fileHandle = await window.showSaveFilePicker({
+                    suggestedName: filename,
+                    types: [{
+                        description: 'Text files',
+                        accept: { 'text/plain': ['.txt'] }
+                    }]
+                });
+                
+                const writable = await fileHandle.createWritable();
+                await writable.write(content);
+                await writable.close();
+                
+                return true; // Success
+            } else {
+                // Fallback to traditional download for older browsers
+                fallbackSaveToClient(filename, content);
+                return true;
+            }
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                // User cancelled the save dialog
+                return false;
+            } else {
+                // Other error, fallback to traditional download
+                console.warn('File System Access API failed, falling back to download:', error);
+                fallbackSaveToClient(filename, content);
+                return true;
+            }
+        }
+    }
+
+    // Fallback save function for older browsers
+    function fallbackSaveToClient(filename, content) {
+        // Create a blob with the content
+        const blob = new Blob([content], { type: 'text/plain' });
+        
+        // Create a temporary URL for the blob
+        const url = window.URL.createObjectURL(blob);
+        
+        // Create a temporary anchor element for download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        
+        // Add to DOM, click, and remove
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        
+        // Clean up the temporary URL
+        window.URL.revokeObjectURL(url);
+    }
 
     // Keyboard shortcuts
     document.addEventListener('keydown', function(event) {
         // Escape key closes modals
         if (event.key === 'Escape') {
-            hideModal(configModal);
             hideModal(helpModal);
             hideModal(saveFileModal);
-            hideModal(overwriteModal);
         }
         
         // Ctrl/Cmd + Enter submits form
@@ -477,12 +717,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Initialize
-    loadConfiguration();
     loadFormValues();
     updateFormValidation();
     
     // Welcome message
-    resultsArea.value = `Welcome to LLMquality!\n\nThis application helps you assess the quality of Large Language Model outputs when processing genealogical data.\n\n1. Select a location, page number, and LLM\n2. Configure your directories (optional)\n3. Click 'Rate' to begin assessment\n\nClick 'Help' for detailed instructions.`;
+    resultsArea.value = `Welcome to LLMquality!\n\nThis application helps you assess the quality of Large Language Model outputs when processing genealogical data.\n\n1. Select a location\n2. Upload your GEDCOM and XML files\n3. Click 'Rate' to begin assessment\n\nClick 'Help' for detailed instructions.`;
     
     console.log('LLMquality application initialized successfully');
 });

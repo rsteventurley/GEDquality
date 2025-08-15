@@ -118,25 +118,39 @@ class DateModel {
         const month = parseInt(isoMatch[2], 10);
         const day = parseInt(isoMatch[3], 10);
         
-        // Validate year range
-        if (year < 1400 || year > 2000) {
-            throw new Error(`Year must be between 1400 and 2000, got ${year}`);
+        // Validate year range (allow 0 for unknown)
+        if (year !== 0 && (year < 1400 || year > 2000)) {
+            throw new Error(`Year must be between 1400 and 2000 or 0 for unknown, got ${year}`);
         }
         
-        // Validate month range
-        if (month < 1 || month > 12) {
-            throw new Error(`Month must be between 1 and 12, got ${month}`);
+        // Validate month range (allow 0 for unknown)
+        if (month < 0 || month > 12) {
+            throw new Error(`Month must be between 0 and 12 (0 for unknown), got ${month}`);
         }
         
-        // Validate day based on month and year
-        const daysInMonth = this._getDaysInMonth(month, year);
-        if (day < 1 || day > daysInMonth) {
-            throw new Error(`Day must be between 1 and ${daysInMonth} for month ${month}, got ${day}`);
+        // Validate day based on month and year (allow 0 for unknown)
+        if (month > 0 && year > 0) {
+            // Only validate day against month/year if both month and year are known
+            const daysInMonth = this._getDaysInMonth(month, year);
+            if (day < 0 || day > daysInMonth) {
+                throw new Error(`Day must be between 0 and ${daysInMonth} for month ${month} (0 for unknown), got ${day}`);
+            }
+        } else {
+            // If month or year is unknown, just check day is not negative
+            if (day < 0 || day > 31) {
+                throw new Error(`Day must be between 0 and 31 (0 for unknown), got ${day}`);
+            }
         }
         
         this.year = year;
         this.month = month;
         this.day = day;
+        
+        // Flag dates with zero values as approximate and about
+        if (year === 0 || month === 0 || day === 0) {
+            this.isApproximate = true;
+            this.isAbout = true;
+        }
     }
 
     /**

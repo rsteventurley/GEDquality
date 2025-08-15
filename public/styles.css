@@ -111,6 +111,54 @@ main {
     flex-wrap: wrap;
 }
 
+/* File upload styles */
+.file-upload-container {
+    position: relative;
+}
+
+.btn-upload {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-height: 60px;
+    justify-content: center;
+}
+
+.btn-upload:hover {
+    border-color: #667eea;
+    background: #f0f0ff;
+    color: #667eea;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-upload.file-selected {
+    border-color: #10b981;
+    background: #ecfdf5;
+    color: #065f46;
+    border-style: solid;
+}
+
+.upload-text {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.file-name {
+    font-size: 0.85rem;
+    color: #059669;
+    font-weight: 500;
+}
+
 button {
     padding: 12px 24px;
     border: none;
@@ -230,7 +278,7 @@ button:active {
     background: white;
     border-radius: 15px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 600px;
+    max-width: 750px;
     width: 90%;
     max-height: 90vh;
     overflow-y: auto;
@@ -282,16 +330,39 @@ button:active {
 
 .directory-input input {
     flex: 1;
-    padding: 10px 14px;
+    padding: 12px 16px;
     border: 2px solid #e2e8f0;
-    border-radius: 6px;
-    font-size: 0.95rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    min-width: 400px;
+    box-sizing: border-box;
 }
 
 .directory-input input:focus {
     outline: none;
     border-color: #667eea;
-    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-browse {
+    padding: 12px 20px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-browse:hover {
+    background-color: #5a6268;
+}
+
+.btn-browse:active {
+    background-color: #545b62;
 }
 
 /* Configuration modal input styles */

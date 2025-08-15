@@ -16,37 +16,25 @@
         <main>
             <form id="dataForm" class="form-container">
                 <div class="form-group">
-                    <label for="location">Location:</label>
-                    <select id="location" name="location" required>
-                        <option value="">-- Select Location --</option>
-                        <option value="Tannenkirch">Tannenkirch</option>
-                        <option value="Bükkösd">Bükkösd</option>
-                        <option value="Flögeln">Flögeln</option>
-                    </select>
+                    <label>GEDCOM File:</label>
+                    <div class="file-upload-container">
+                        <input type="file" id="gedcomFile" accept=".ged,.gedcom" style="display: none;">
+                        <button type="button" id="gedcomUploadBtn" class="btn-upload">
+                            <span class="upload-text">Choose GEDCOM File</span>
+                            <span class="file-name" id="gedcomFileName"></span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="page">Page:</label>
-                    <input 
-                        type="number" 
-                        id="page" 
-                        name="page" 
-                        min="0" 
-                        step="1" 
-                        placeholder="Enter page number"
-                        required
-                    >
-                    <div class="input-help">Please enter a non-negative integer (0 or greater)</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="llm">LLM:</label>
-                    <select id="llm" name="llm" required>
-                        <option value="">-- Select LLM --</option>
-                        <option value="Claude">Claude</option>
-                        <option value="ChatGPT">ChatGPT</option>
-                        <option value="Gemini">Gemini</option>
-                    </select>
+                    <label>XML File:</label>
+                    <div class="file-upload-container">
+                        <input type="file" id="xmlFile" accept=".xml" style="display: none;">
+                        <button type="button" id="xmlUploadBtn" class="btn-upload">
+                            <span class="upload-text">Choose XML File</span>
+                            <span class="file-name" id="xmlFileName"></span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="form-actions">
@@ -54,7 +42,6 @@
                         <span class="btn-text">Rate</span>
                         <span class="btn-spinner" style="display: none;">⟳</span>
                     </button>
-                    <button type="button" id="configBtn" class="btn-secondary">Configure</button>
                     <button type="button" id="helpBtn" class="btn-info">Help</button>
                 </div>
             </form>
@@ -78,36 +65,6 @@
         </footer>
     </div>
 
-    <!-- Configuration Modal -->
-    <div id="configModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Configuration Settings</h2>
-                <span class="modal-close" id="closeConfigModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="groundTruthDir">Ground Truth GEDCOM Directory:</label>
-                    <input type="text" id="groundTruthDir" name="groundTruthDir" placeholder="Enter directory path...">
-                </div>
-
-                <div class="form-group">
-                    <label for="llmXmlDir">LLM XML Directory:</label>
-                    <input type="text" id="llmXmlDir" name="llmXmlDir" placeholder="Enter directory path...">
-                </div>
-
-                <div class="form-group">
-                    <label for="outputDir">Output Directory:</label>
-                    <input type="text" id="outputDir" name="outputDir" placeholder="Enter directory path...">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="configOk" class="btn-primary">OK</button>
-                <button type="button" id="configCancel" class="btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Help Modal -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
@@ -122,19 +79,18 @@
                     
                     <h3>🔧 Basic Usage</h3>
                     <ol>
-                        <li><strong>Location:</strong> Select the geographic location of your genealogical data (Tannenkirch, Bükkösd, or Flögeln)</li>
-                        <li><strong>Page:</strong> Enter the page number you want to process (must be a positive integer)</li>
-                        <li><strong>LLM:</strong> Choose which Large Language Model to evaluate (Claude, ChatGPT, or Gemini)</li>
+                        <li><strong>GEDCOM File:</strong> Upload your reference GEDCOM file by clicking "Choose GEDCOM File"</li>
+                        <li><strong>XML File:</strong> Upload the LLM-generated XML file by clicking "Choose XML File"</li>
                         <li><strong>Rate:</strong> Click the Rate button to begin the quality assessment process</li>
                     </ol>
 
-                    <h3>⚙️ Configuration</h3>
-                    <p>Before rating, configure the application directories:</p>
+                    <h3>📁 File Upload</h3>
+                    <p>Upload the required files for analysis:</p>
                     <ul>
-                        <li><strong>Ground Truth GEDCOM Directory:</strong> Path to the reference GEDCOM files</li>
-                        <li><strong>LLM XML Directory:</strong> Path to the LLM-generated XML output files</li>
+                        <li><strong>GEDCOM File:</strong> The reference genealogical data file (.ged or .gedcom format)</li>
+                        <li><strong>XML File:</strong> The LLM-generated output file (.xml format)</li>
                     </ul>
-                    <p>Click the Configure button to set these paths. The application will remember your settings using browser cookies.</p>
+                    <p>Both files are uploaded securely to the server for processing and are automatically cleaned up after analysis.</p>
 
                     <h3>📊 Results</h3>
                     <p>The results area will display:</p>
@@ -177,23 +133,6 @@
             <div class="modal-footer">
                 <button type="button" id="saveFileOk" class="btn-primary">OK</button>
                 <button type="button" id="saveFileCancel" class="btn-secondary">Cancel</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- File Overwrite Confirmation Modal -->
-    <div id="overwriteModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>File Already Exists</h2>
-                <span class="modal-close" id="closeOverwriteModal">&times;</span>
-            </div>
-            <div class="modal-body">
-                <p id="overwriteMessage">The file already exists. Do you want to overwrite it?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="overwriteYes" class="btn-primary">Yes, Overwrite</button>
-                <button type="button" id="overwriteNo" class="btn-secondary">No, Cancel</button>
             </div>
         </div>
     </div>
