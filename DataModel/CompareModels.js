@@ -18,6 +18,72 @@ class CompareModels {
     }
 
     /**
+     * Get common entries between the two PageModels
+     * @returns {Array<string>} Array of entry IDs that exist in both PageModels
+     * @private
+     */
+    _getCommonEntries() {
+        const entriesFirst = Object.keys(this.pageModel1.entries);
+        const entriesSecond = Object.keys(this.pageModel2.entries);
+        return entriesFirst.filter(entryId => entriesSecond.includes(entryId));
+    }
+
+    /**
+     * Prepare people arrays for comparison from entry objects
+     * @param {EntryModel} entry1 - Entry from first PageModel
+     * @param {EntryModel} entry2 - Entry from second PageModel
+     * @returns {Object} Object containing people arrays and match tracking sets
+     * @private
+     */
+    _preparePeopleForComparison(entry1, entry2) {
+        const people1 = Object.keys(entry1.people).map(id => ({ id: parseInt(id), person: entry1.people[id] }));
+        const people2 = Object.keys(entry2.people).map(id => ({ id: parseInt(id), person: entry2.people[id] }));
+        const matched1 = new Set();
+        const matched2 = new Set();
+        
+        return { people1, people2, matched1, matched2 };
+    }
+
+    /**
+     * Execute the complete people matching algorithm between two entry's people
+     * @param {Array} people1 - People array from first entry
+     * @param {Array} people2 - People array from second entry
+     * @param {EntryModel} entry1 - Entry from first PageModel
+     * @param {EntryModel} entry2 - Entry from second PageModel
+     * @param {Object} result - Result object to populate with matches
+     * @param {Set} matched1 - Set to track matched people from first entry
+     * @param {Set} matched2 - Set to track matched people from second entry
+     * @private
+     */
+    _executeCompleteMatchingAlgorithm(people1, people2, entry1, entry2, result, matched1, matched2) {
+        // Priority 1: Exact name matches that are unique within the entry
+        this._findExactNameMatches(people1, people2, entry1, entry2, result, matched1, matched2);
+
+        // Priority 2: Same events or references
+        this._findEventReferenceMatches(people1, people2, result, matched1, matched2);
+
+        // Priority 3: Relationship similar matches
+        this._findRelationshipSimilarMatches(people1, people2, entry1, entry2, result, matched1, matched2);
+
+        // Priority 4: Similar names
+        this._findSimilarNameMatches(people1, people2, result, matched1, matched2);
+
+        // Priority 5: Final pass for exact names (handles ambiguous cases)
+        this._findExactNameMatchesFinalPass(people1, people2, entry1, entry2, result, matched1, matched2);
+    }
+
+    /**
+     * Calculate error rates for comparison results
+     * @param {number} errors - Number of errors
+     * @param {number} total - Total items compared
+     * @returns {number} Error rate as percentage
+     * @private
+     */
+    _calculateErrorRate(errors, total) {
+        return total > 0 ? (errors / total) * 100 : 0.0;
+    }
+
+    /**
      * Compare entries between the two PageModels
      * @returns {Object} Object containing arrays of entry IDs that are unique to each model
      * @returns {Array<string>} returns.onlyInFirst - Entry IDs that appear only in the first PageModel
@@ -65,11 +131,8 @@ class CompareModels {
             details: []
         };
 
-        // Get common entries (entries that exist in both PageModels)
-        const entriesFirst = Object.keys(this.pageModel1.entries);
-        const entriesSecond = Object.keys(this.pageModel2.entries);
-        const commonEntries = entriesFirst.filter(entryId => entriesSecond.includes(entryId));
-
+        // Get common entries using shared method
+        const commonEntries = this._getCommonEntries();
         results.entriesCompared = commonEntries.length;
 
         // Compare people in each common entry
@@ -137,26 +200,11 @@ class CompareModels {
             similarNameMatches: 0
         };
 
-        const people1 = Object.keys(entry1.people).map(id => ({ id: parseInt(id), person: entry1.people[id] }));
-        const people2 = Object.keys(entry2.people).map(id => ({ id: parseInt(id), person: entry2.people[id] }));
-        
-        const matched1 = new Set();
-        const matched2 = new Set();
+        // Prepare people arrays and match tracking using shared method
+        const { people1, people2, matched1, matched2 } = this._preparePeopleForComparison(entry1, entry2);
 
-        // Priority 1: Exact name matches that are unique within the entry
-        this._findExactNameMatches(people1, people2, entry1, entry2, result, matched1, matched2);
-
-        // Priority 2: Same events or references
-        this._findEventReferenceMatches(people1, people2, result, matched1, matched2);
-
-        // Priority 3: Similar names with same relationship
-        this._findRelationshipSimilarMatches(people1, people2, entry1, entry2, result, matched1, matched2);
-
-        // Priority 4: Similar names (fallback)
-        this._findSimilarNameMatches(people1, people2, result, matched1, matched2);
-
-        // Priority 5: Final pass for exact name matches (in case ambiguities were resolved)
-        this._findExactNameMatchesFinalPass(people1, people2, entry1, entry2, result, matched1, matched2);
+        // Execute complete matching algorithm using shared method
+        this._executeCompleteMatchingAlgorithm(people1, people2, entry1, entry2, result, matched1, matched2);
 
         // Record unmatched people
         result.unmatchedInFirst = people1.filter(p => !matched1.has(p.id)).map(p => ({
@@ -515,11 +563,8 @@ class CompareModels {
             details: []
         };
 
-        // Get common entries (entries that exist in both PageModels)
-        const entriesFirst = Object.keys(this.pageModel1.entries);
-        const entriesSecond = Object.keys(this.pageModel2.entries);
-        const commonEntries = entriesFirst.filter(entryId => entriesSecond.includes(entryId));
-
+        // Get common entries using shared method
+        const commonEntries = this._getCommonEntries();
         results.entriesCompared = commonEntries.length;
 
         // Compare references in each common entry
@@ -536,11 +581,9 @@ class CompareModels {
             results.crossReferencePrecisionErrors += entryResult.precisionErrors.length;
         }
 
-        // Calculate error rates
-        if (results.totalMatches > 0) {
-            results.recallErrorRate = (results.crossReferenceRecallErrors / results.totalMatches) * 100;
-            results.precisionErrorRate = (results.crossReferencePrecisionErrors / results.totalMatches) * 100;
-        }
+        // Calculate error rates using shared method
+        results.recallErrorRate = this._calculateErrorRate(results.crossReferenceRecallErrors, results.totalMatches);
+        results.precisionErrorRate = this._calculateErrorRate(results.crossReferencePrecisionErrors, results.totalMatches);
 
         return results;
     }
@@ -561,18 +604,11 @@ class CompareModels {
             precisionErrors: []
         };
 
-        const people1 = Object.keys(entry1.people).map(id => ({ id: parseInt(id), person: entry1.people[id] }));
-        const people2 = Object.keys(entry2.people).map(id => ({ id: parseInt(id), person: entry2.people[id] }));
-        
-        const matched1 = new Set();
-        const matched2 = new Set();
+        // Prepare people arrays and match tracking using shared method
+        const { people1, people2, matched1, matched2 } = this._preparePeopleForComparison(entry1, entry2);
 
-        // Use the same matching algorithm as comparePeople to find corresponding people
-        this._findExactNameMatches(people1, people2, entry1, entry2, result, matched1, matched2);
-        this._findEventReferenceMatches(people1, people2, result, matched1, matched2);
-        this._findRelationshipSimilarMatches(people1, people2, entry1, entry2, result, matched1, matched2);
-        this._findSimilarNameMatches(people1, people2, result, matched1, matched2);
-        this._findExactNameMatchesFinalPass(people1, people2, entry1, entry2, result, matched1, matched2);
+        // Execute complete matching algorithm using shared method
+        this._executeCompleteMatchingAlgorithm(people1, people2, entry1, entry2, result, matched1, matched2);
 
         // Now compare cross-references for matched people
         for (const match of result.matches) {
@@ -650,6 +686,428 @@ class CompareModels {
 
         // References match perfectly
         return null;
+    }
+
+    /**
+     * Compare relationship strings between people in the two PageModels
+     * First matches people using the same algorithm as comparePeople, then checks if their relationship strings match
+     * @returns {Object} Object containing relationship comparison results
+     */
+    compareRelationships() {
+        const results = {
+            entriesCompared: 0,
+            totalMatches: 0,
+            relationshipRecallErrors: 0,
+            relationshipRecallErrorRate: 0.0,
+            details: []
+        };
+
+        // Get common entries using shared method
+        const commonEntries = this._getCommonEntries();
+        results.entriesCompared = commonEntries.length;
+
+        // Compare relationships in each common entry
+        for (const entryId of commonEntries) {
+            const entry1 = this.pageModel1.entries[entryId];
+            const entry2 = this.pageModel2.entries[entryId];
+
+            const entryResult = this._compareRelationshipsInEntry(entry1, entry2, entryId);
+            results.details.push(entryResult);
+
+            // Aggregate statistics
+            results.totalMatches += entryResult.matches.length;
+            results.relationshipRecallErrors += entryResult.recallErrors.length;
+        }
+
+        // Calculate error rate using shared method
+        results.relationshipRecallErrorRate = this._calculateErrorRate(results.relationshipRecallErrors, results.totalMatches);
+
+        return results;
+    }
+
+    /**
+     * Compare relationship strings within a single entry between the two models
+     * @param {EntryModel} entry1 - Entry from first PageModel
+     * @param {EntryModel} entry2 - Entry from second PageModel
+     * @param {string} entryId - The entry ID being compared
+     * @returns {Object} Detailed relationship comparison results for this entry
+     * @private
+     */
+    _compareRelationshipsInEntry(entry1, entry2, entryId) {
+        const result = {
+            entryId: entryId,
+            matches: [],
+            recallErrors: []
+        };
+
+        // Prepare people arrays and match tracking using shared method
+        const { people1, people2, matched1, matched2 } = this._preparePeopleForComparison(entry1, entry2);
+
+        // Execute complete matching algorithm using shared method
+        this._executeCompleteMatchingAlgorithm(people1, people2, entry1, entry2, result, matched1, matched2);
+
+        // Now compare relationship strings for matched people
+        for (const match of result.matches) {
+            const relationship1 = entry1.getRelationship(match.person1Id);
+            const relationship2 = entry2.getRelationship(match.person2Id);
+
+            // Extract letter portions for comparison (ignore the digit)
+            const letters1 = this._extractRelationshipLetters(relationship1);
+            const letters2 = this._extractRelationshipLetters(relationship2);
+
+            // Check if relationship strings differ (recall error)
+            // Two relationship strings agree if they both have no letters after the digit 
+            // or if the letters after the digit are identical
+            if (letters1 !== letters2) {
+                result.recallErrors.push({
+                    person1Id: match.person1Id,
+                    person2Id: match.person2Id,
+                    person1Name: match.person1Name,
+                    person2Name: match.person2Name,
+                    relationship1: relationship1,
+                    relationship2: relationship2,
+                    letters1: letters1,
+                    letters2: letters2,
+                    matchType: match.matchType
+                });
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Compare events between people in the two PageModels
+     * First matches people using the same algorithm as comparePeople, then checks if their events match
+     * @returns {Object} Object containing event comparison results
+     */
+    compareEvents() {
+        const results = {
+            entriesCompared: 0,
+            totalMatches: 0,
+            eventRecallErrors: 0,
+            eventPrecisionErrors: 0,
+            recallErrorRate: 0.0,
+            precisionErrorRate: 0.0,
+            details: []
+        };
+
+        // Get common entries using shared method
+        const commonEntries = this._getCommonEntries();
+        results.entriesCompared = commonEntries.length;
+
+        // Compare events in each common entry
+        for (const entryId of commonEntries) {
+            const entry1 = this.pageModel1.entries[entryId];
+            const entry2 = this.pageModel2.entries[entryId];
+
+            const entryResult = this._compareEventsInEntry(entry1, entry2, entryId);
+            results.details.push(entryResult);
+
+            // Aggregate statistics
+            results.totalMatches += entryResult.matches.length;
+            results.eventRecallErrors += entryResult.recallErrors.length;
+            results.eventPrecisionErrors += entryResult.precisionErrors.length;
+        }
+
+        // Calculate error rates using shared method
+        results.recallErrorRate = this._calculateErrorRate(results.eventRecallErrors, results.totalMatches);
+        results.precisionErrorRate = this._calculateErrorRate(results.eventPrecisionErrors, results.totalMatches);
+
+        return results;
+    }
+
+    /**
+     * Compare events within a single entry between the two models
+     * @param {EntryModel} entry1 - Entry from first PageModel
+     * @param {EntryModel} entry2 - Entry from second PageModel
+     * @param {string} entryId - The entry ID being compared
+     * @returns {Object} Detailed event comparison results for this entry
+     * @private
+     */
+    _compareEventsInEntry(entry1, entry2, entryId) {
+        const result = {
+            entryId: entryId,
+            matches: [],
+            recallErrors: [],
+            precisionErrors: []
+        };
+
+        // Prepare people arrays and match tracking using shared method
+        const { people1, people2, matched1, matched2 } = this._preparePeopleForComparison(entry1, entry2);
+
+        // Execute complete matching algorithm using shared method
+        this._executeCompleteMatchingAlgorithm(people1, people2, entry1, entry2, result, matched1, matched2);
+
+        // Now compare events for matched people
+        for (const match of result.matches) {
+            const person1 = this.pageModel1.people[match.person1Id];
+            const person2 = this.pageModel2.people[match.person2Id];
+
+            if (person1 && person2) {
+                const eventComparison = this._comparePersonEvents(person1, person2, match);
+                
+                if (eventComparison.recallErrors.length > 0) {
+                    result.recallErrors.push(...eventComparison.recallErrors);
+                }
+                if (eventComparison.precisionErrors.length > 0) {
+                    result.precisionErrors.push(...eventComparison.precisionErrors);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Compare events between two matched people
+     * @param {PersonModel} person1 - Person from first PageModel
+     * @param {PersonModel} person2 - Person from second PageModel
+     * @param {Object} match - The match object containing person IDs and names
+     * @returns {Object} Event comparison result with recall and precision errors
+     * @private
+     */
+    _comparePersonEvents(person1, person2, match) {
+        const result = {
+            recallErrors: [],
+            precisionErrors: []
+        };
+
+        // Compare basic life events: birth, death, christening, burial
+        const eventTypes = ['birth', 'death', 'christening', 'burial'];
+        
+        for (const eventType of eventTypes) {
+            const event1 = person1[eventType];
+            const event2 = person2[eventType];
+            
+            const eventComparison = this._compareEventPair(event1, event2, eventType, match);
+            
+            if (eventComparison && eventComparison.type === 'recall') {
+                result.recallErrors.push(eventComparison);
+            } else if (eventComparison && eventComparison.type === 'precision') {
+                result.precisionErrors.push(eventComparison);
+            }
+        }
+
+        // Compare marriage events through family relationships
+        const marriageComparison = this._compareMarriageEvents(person1, person2, match);
+        
+        if (marriageComparison.recallErrors.length > 0) {
+            result.recallErrors.push(...marriageComparison.recallErrors);
+        }
+        if (marriageComparison.precisionErrors.length > 0) {
+            result.precisionErrors.push(...marriageComparison.precisionErrors);
+        }
+
+        return result;
+    }
+
+    /**
+     * Compare a specific event between two people
+     * @param {EventModel} event1 - Event from first person
+     * @param {EventModel} event2 - Event from second person
+     * @param {string} eventType - Type of event (birth, death, etc.)
+     * @param {Object} match - The match object containing person IDs and names
+     * @returns {Object|null} Event comparison result or null if events match
+     * @private
+     */
+    _compareEventPair(event1, event2, eventType, match) {
+        const isEmpty1 = !event1 || event1.isEmpty();
+        const isEmpty2 = !event2 || event2.isEmpty();
+
+        // If both events are empty, they match
+        if (isEmpty1 && isEmpty2) {
+            return null;
+        }
+
+        // If one event is missing, it's a recall error
+        if (isEmpty1 !== isEmpty2) {
+            return {
+                type: 'recall',
+                eventType: eventType,
+                person1Id: match.person1Id,
+                person2Id: match.person2Id,
+                person1Name: match.person1Name,
+                person2Name: match.person2Name,
+                event1: isEmpty1 ? null : this._eventToString(event1),
+                event2: isEmpty2 ? null : this._eventToString(event2),
+                missingIn: isEmpty1 ? 'first' : 'second'
+            };
+        }
+
+        // If both events exist, compare their content
+        if (!isEmpty1 && !isEmpty2) {
+            const date1Str = event1.date ? event1.date.toString() : '';
+            const date2Str = event2.date ? event2.date.toString() : '';
+            const place1 = event1.place || '';
+            const place2 = event2.place || '';
+
+            // Events are different if dates or places don't match
+            const datesDiffer = (date1Str !== '' || date2Str !== '') && date1Str !== date2Str;
+            const placesDiffer = (place1 !== '' || place2 !== '') && place1 !== place2;
+
+            if (datesDiffer || placesDiffer) {
+                return {
+                    type: 'precision',
+                    eventType: eventType,
+                    person1Id: match.person1Id,
+                    person2Id: match.person2Id,
+                    person1Name: match.person1Name,
+                    person2Name: match.person2Name,
+                    event1: this._eventToString(event1),
+                    event2: this._eventToString(event2),
+                    datesDiffer: datesDiffer,
+                    placesDiffer: placesDiffer
+                };
+            }
+        }
+
+        return null; // Events match
+    }
+
+    /**
+     * Compare marriage events through family relationships
+     * @param {PersonModel} person1 - Person from first PageModel
+     * @param {PersonModel} person2 - Person from second PageModel
+     * @param {Object} match - The match object containing person IDs and names
+     * @returns {Object} Marriage comparison result with recall and precision errors
+     * @private
+     */
+    _compareMarriageEvents(person1, person2, match) {
+        const result = {
+            recallErrors: [],
+            precisionErrors: []
+        };
+
+        // Get families where this person is a spouse
+        const families1 = this._getSpouseFamilies(person1, this.pageModel1);
+        const families2 = this._getSpouseFamilies(person2, this.pageModel2);
+
+        // If both have no marriage families, they match
+        if (families1.length === 0 && families2.length === 0) {
+            return result;
+        }
+
+        // If one has marriages and the other doesn't, it's a recall error
+        if (families1.length !== families2.length) {
+            result.recallErrors.push({
+                type: 'recall',
+                eventType: 'marriage',
+                person1Id: match.person1Id,
+                person2Id: match.person2Id,
+                person1Name: match.person1Name,
+                person2Name: match.person2Name,
+                families1Count: families1.length,
+                families2Count: families2.length,
+                missingIn: families1.length < families2.length ? 'first' : 'second'
+            });
+            return result; // Don't proceed to precision comparison if counts differ
+        }
+
+        // Compare marriage events in each family (assuming same order/correspondence)
+        for (let i = 0; i < Math.min(families1.length, families2.length); i++) {
+            const family1 = families1[i];
+            const family2 = families2[i];
+            
+            const marriage1 = family1.marriage;
+            const marriage2 = family2.marriage;
+            
+            const marriageComparison = this._compareEventPair(marriage1, marriage2, 'marriage', match);
+            
+            if (marriageComparison && marriageComparison.type === 'recall') {
+                marriageComparison.familyIndex = i;
+                result.recallErrors.push(marriageComparison);
+            } else if (marriageComparison && marriageComparison.type === 'precision') {
+                marriageComparison.familyIndex = i;
+                result.precisionErrors.push(marriageComparison);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Get families where a person appears as husband or wife
+     * @param {PersonModel} person - The person to check
+     * @param {PageModel} pageModel - The PageModel containing the families
+     * @returns {Array} Array of FamilyModel objects where person is a spouse
+     * @private
+     */
+    _getSpouseFamilies(person, pageModel) {
+        const spouseFamilies = [];
+        
+        // Check families listed in person's families array
+        if (person.families && person.families.length > 0) {
+            for (const familyId of person.families) {
+                const family = pageModel.families[familyId];
+                if (family) {
+                    // Find the person ID for this person in the PageModel
+                    const personId = Object.keys(pageModel.people).find(id => 
+                        pageModel.people[id] === person || 
+                        JSON.stringify(pageModel.people[id]) === JSON.stringify(person)
+                    );
+                    
+                    if (personId && (family.husband === parseInt(personId) || family.wife === parseInt(personId))) {
+                        spouseFamilies.push(family);
+                    }
+                }
+            }
+        }
+        
+        return spouseFamilies;
+    }
+
+    /**
+     * Convert an event to a readable string representation
+     * @param {EventModel} event - The event to convert
+     * @returns {string} String representation of the event
+     * @private
+     */
+    _eventToString(event) {
+        if (!event || event.isEmpty()) {
+            return 'Empty event';
+        }
+        
+        const dateStr = event.date ? event.date.toString() : '';
+        const place = event.place || '';
+        
+        // Filter out "<Empty>" strings from date
+        const validDateStr = dateStr && dateStr !== '<Empty>' ? dateStr : '';
+        
+        if (validDateStr && place) {
+            return `${validDateStr} at ${place}`;
+        } else if (validDateStr) {
+            return validDateStr;
+        } else if (place) {
+            return `at ${place}`;
+        }
+        
+        return 'Event recorded (no date/place)';
+    }
+
+    /**
+     * Extract the letter portion from a relationship string
+     * Relationship format: digit followed by 0 or more letters
+     * @param {string} relationshipString - The relationship string to parse
+     * @returns {string} The letters portion after the digit, or empty string if no letters
+     * @private
+     */
+    _extractRelationshipLetters(relationshipString) {
+        if (!relationshipString || typeof relationshipString !== 'string') {
+            return '';
+        }
+
+        // Match pattern: digit followed by 0 or more letters
+        const match = relationshipString.match(/^\d+([a-zA-Z]*)$/);
+        
+        if (match) {
+            // Return the letters portion (group 1), or empty string if no letters
+            return match[1] || '';
+        }
+        
+        // If the string doesn't match the expected format, return empty string
+        // This handles edge cases where relationship string might be malformed
+        return '';
     }
 }
 

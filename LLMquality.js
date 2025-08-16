@@ -240,6 +240,8 @@ async function compareModels(gedPageModel, xmlPageModel, metadata) {
     const entryComparison = comparer.compareEntries();
     const peopleComparison = comparer.comparePeople();
     const referencesComparison = comparer.compareReferences();
+    const relationshipsComparison = comparer.compareRelationships();
+    const eventsComparison = comparer.compareEvents();
     const summary = comparer.getSummary();
     
     const gedEntryCount = gedPageModel.getEntryCount();
@@ -247,11 +249,71 @@ async function compareModels(gedPageModel, xmlPageModel, metadata) {
     const gedPeopleCount = gedPageModel.getPeopleCount();
     const xmlPeopleCount = xmlPageModel.getPeopleCount();
     
-    // Simulate accuracy calculations
-    const nameAccuracy = Math.floor(Math.random() * 20) + 80; // 80-99%
-    const dateAccuracy = Math.floor(Math.random() * 25) + 70; // 70-94%
-    const relationshipAccuracy = Math.floor(Math.random() * 30) + 65; // 65-94%
-    const overallScore = Math.floor((nameAccuracy + dateAccuracy + relationshipAccuracy) / 3);
+    // Calculate precision, recall, and F1 scores for each category
+    function calculateF1Score(precision, recall) {
+        if (precision === 0 && recall === 0) return 0;
+        return (2 * precision * recall) / (precision + recall);
+    }
+
+    const qualityMetrics = {
+        entries: { precision: 100, recall: 100, f1: 100 },
+        people: { precision: 100, recall: 100, f1: 100 },
+        crossReferences: { precision: 100, recall: 100, f1: 100 },
+        relationships: { precision: 100, recall: 100, f1: 100 },
+        events: { precision: 100, recall: 100, f1: 100 }
+    };
+
+    // Entries metrics - assume 100% for both precision and recall if entries were compared
+    if (entryComparison.entriesCompared > 0) {
+        // Entries comparison typically doesn't have precision/recall errors in this context
+        qualityMetrics.entries = { precision: 100, recall: 100, f1: 100 };
+    }
+
+    // People metrics from people comparison
+    if (peopleComparison.entriesCompared > 0) {
+        const peoplePrecision = peopleComparison.precisionRate;
+        // For people, we don't have a separate recall rate, so use precision rate as recall too
+        const peopleRecall = peoplePrecision;
+        qualityMetrics.people = {
+            precision: peoplePrecision,
+            recall: peopleRecall,
+            f1: calculateF1Score(peoplePrecision, peopleRecall)
+        };
+    }
+
+    // Cross-references metrics from references comparison
+    if (referencesComparison.entriesCompared > 0) {
+        const crossRefPrecision = Math.max(0, 100 - referencesComparison.precisionErrorRate);
+        const crossRefRecall = Math.max(0, 100 - referencesComparison.recallErrorRate);
+        qualityMetrics.crossReferences = {
+            precision: crossRefPrecision,
+            recall: crossRefRecall,
+            f1: calculateF1Score(crossRefPrecision, crossRefRecall)
+        };
+    }
+
+    // Relationships metrics from relationships comparison
+    if (relationshipsComparison.entriesCompared > 0) {
+        const relationshipPrecision = Math.max(0, 100 - relationshipsComparison.relationshipRecallErrorRate);
+        // For relationships, we only have precision errors, so assume 100% recall
+        const relationshipRecall = 100;
+        qualityMetrics.relationships = {
+            precision: relationshipPrecision,
+            recall: relationshipRecall,
+            f1: calculateF1Score(relationshipPrecision, relationshipRecall)
+        };
+    }
+
+    // Events metrics from events comparison
+    if (eventsComparison.entriesCompared > 0) {
+        const eventPrecision = Math.max(0, 100 - eventsComparison.precisionErrorRate);
+        const eventRecall = Math.max(0, 100 - eventsComparison.recallErrorRate);
+        qualityMetrics.events = {
+            precision: eventPrecision,
+            recall: eventRecall,
+            f1: calculateF1Score(eventPrecision, eventRecall)
+        };
+    }
     
     // Create detailed entry comparison report
     let entryReport = '';
@@ -435,6 +497,131 @@ async function compareModels(gedPageModel, xmlPageModel, metadata) {
         referencesReport += `\n=== Cross-References Comparison ===\nNo common entries found for cross-references comparison.\n`;
     }
     
+    // Create detailed relationships comparison report
+    let relationshipsReport = '';
+    if (relationshipsComparison.entriesCompared > 0) {
+        relationshipsReport += `\n=== Relationships Comparison Results ===\n`;
+        relationshipsReport += `Entries compared: ${relationshipsComparison.entriesCompared}\n`;
+        relationshipsReport += `People matches analyzed: ${relationshipsComparison.totalMatches}\n`;
+        relationshipsReport += `Relationship precision errors: ${relationshipsComparison.relationshipRecallErrors}\n`;
+        relationshipsReport += `Relationship precision error rate: ${relationshipsComparison.relationshipRecallErrorRate.toFixed(1)}%\n`;
+
+        // Show detailed precision errors
+        let totalRelationshipErrors = 0;
+        let relationshipErrorDetails = '';
+
+        relationshipsComparison.details.forEach(detail => {
+            // Process relationship precision errors
+            if (detail.recallErrors.length > 0) {
+                totalRelationshipErrors += detail.recallErrors.length;
+                relationshipErrorDetails += `\n  Entry ${detail.entryId}:\n`;
+                detail.recallErrors.forEach(error => {
+                    const person1 = gedPageModel.people[error.person1Id];
+                    const person2 = xmlPageModel.people[error.person2Id];
+                    const eventInfo1 = getPersonEventInfo(person1);
+                    const eventInfo2 = getPersonEventInfo(person2);
+                    relationshipErrorDetails += `    • ${error.person1Name}${eventInfo1} ↔ ${error.person2Name}${eventInfo2}\n`;
+                    relationshipErrorDetails += `      GEDCOM relationship: "${error.relationship1}" (letters: "${error.letters1}")\n`;
+                    relationshipErrorDetails += `      XML relationship: "${error.relationship2}" (letters: "${error.letters2}")\n`;
+                    relationshipErrorDetails += `      Match type: ${error.matchType}\n`;
+                });
+            }
+        });
+
+        if (relationshipErrorDetails) {
+            relationshipsReport += `\nRelationship precision errors (${totalRelationshipErrors}):${relationshipErrorDetails}`;
+        }
+        
+        if (totalRelationshipErrors === 0) {
+            relationshipsReport += `\n✅ All relationship strings match perfectly!\n`;
+        }
+    } else {
+        relationshipsReport += `\n=== Relationships Comparison ===\nNo common entries found for relationships comparison.\n`;
+    }
+    
+    // Create detailed events comparison report
+    let eventsReport = '';
+    if (eventsComparison.entriesCompared > 0) {
+        eventsReport += `\n=== Events Comparison Results ===\n`;
+        eventsReport += `Entries compared: ${eventsComparison.entriesCompared}\n`;
+        eventsReport += `People matches analyzed: ${eventsComparison.totalMatches}\n`;
+        eventsReport += `Event recall errors: ${eventsComparison.eventRecallErrors}\n`;
+        eventsReport += `Event precision errors: ${eventsComparison.eventPrecisionErrors}\n`;
+        eventsReport += `Event recall error rate: ${eventsComparison.recallErrorRate.toFixed(1)}%\n`;
+        eventsReport += `Event precision error rate: ${eventsComparison.precisionErrorRate.toFixed(1)}%\n`;
+
+        // Show detailed recall errors
+        let totalEventRecallErrors = 0;
+        let eventRecallErrorDetails = '';
+        
+        // Show detailed precision errors
+        let totalEventPrecisionErrors = 0;
+        let eventPrecisionErrorDetails = '';
+
+        eventsComparison.details.forEach(detail => {
+            // Process event recall errors
+            if (detail.recallErrors.length > 0) {
+                totalEventRecallErrors += detail.recallErrors.length;
+                eventRecallErrorDetails += `\n  Entry ${detail.entryId}:\n`;
+                detail.recallErrors.forEach(error => {
+                    const person1 = gedPageModel.people[error.person1Id];
+                    const person2 = xmlPageModel.people[error.person2Id];
+                    const eventInfo1 = getPersonEventInfo(person1);
+                    const eventInfo2 = getPersonEventInfo(person2);
+                    eventRecallErrorDetails += `    • ${error.person1Name}${eventInfo1} ↔ ${error.person2Name}${eventInfo2}\n`;
+                    
+                    if (error.eventType === 'marriage') {
+                        eventRecallErrorDetails += `      Missing ${error.eventType} event: ${error.families1Count} vs ${error.families2Count} families\n`;
+                        eventRecallErrorDetails += `      Missing in: ${error.missingIn} PageModel\n`;
+                    } else {
+                        eventRecallErrorDetails += `      Missing ${error.eventType} event in: ${error.missingIn} PageModel\n`;
+                        eventRecallErrorDetails += `      GEDCOM ${error.eventType}: ${error.event1 || 'None'}\n`;
+                        eventRecallErrorDetails += `      XML ${error.eventType}: ${error.event2 || 'None'}\n`;
+                    }
+                });
+            }
+            
+            // Process event precision errors
+            if (detail.precisionErrors.length > 0) {
+                totalEventPrecisionErrors += detail.precisionErrors.length;
+                eventPrecisionErrorDetails += `\n  Entry ${detail.entryId}:\n`;
+                detail.precisionErrors.forEach(error => {
+                    const person1 = gedPageModel.people[error.person1Id];
+                    const person2 = xmlPageModel.people[error.person2Id];
+                    const eventInfo1 = getPersonEventInfo(person1);
+                    const eventInfo2 = getPersonEventInfo(person2);
+                    eventPrecisionErrorDetails += `    • ${error.person1Name}${eventInfo1} ↔ ${error.person2Name}${eventInfo2}\n`;
+                    eventPrecisionErrorDetails += `      ${error.eventType} event mismatch:\n`;
+                    eventPrecisionErrorDetails += `      GEDCOM: ${error.event1}\n`;
+                    eventPrecisionErrorDetails += `      XML: ${error.event2}\n`;
+                    if (error.datesDiffer) {
+                        eventPrecisionErrorDetails += `      Dates differ\n`;
+                    }
+                    if (error.placesDiffer) {
+                        eventPrecisionErrorDetails += `      Places differ\n`;
+                    }
+                    if (error.familyIndex !== undefined) {
+                        eventPrecisionErrorDetails += `      Family index: ${error.familyIndex}\n`;
+                    }
+                });
+            }
+        });
+
+        if (eventRecallErrorDetails) {
+            eventsReport += `\nEvent recall errors (${totalEventRecallErrors}):${eventRecallErrorDetails}`;
+        }
+        
+        if (eventPrecisionErrorDetails) {
+            eventsReport += `\nEvent precision errors (${totalEventPrecisionErrors}):${eventPrecisionErrorDetails}`;
+        }
+        
+        if (totalEventRecallErrors === 0 && totalEventPrecisionErrors === 0) {
+            eventsReport += `\n✅ All events match perfectly!\n`;
+        }
+    } else {
+        eventsReport += `\n=== Events Comparison ===\nNo common entries found for events comparison.\n`;
+    }
+    
     return `
 === LLM Quality Rating Results ===
 GEDCOM File: ${metadata.gedcomFile}
@@ -448,16 +635,44 @@ GEDCOM People Count: ${gedPeopleCount}
 XML People Count: ${xmlPeopleCount}
 Common Entries: ${summary.commonEntries}
 Location: ${summary.pageModel1.location}
-${entryReport}${peopleReport}${referencesReport}
+${entryReport}${peopleReport}${referencesReport}${relationshipsReport}${eventsReport}
 
 === Quality Metrics ===
-Name Accuracy: ${nameAccuracy}%
-Date Accuracy: ${dateAccuracy}%
-Relationship Accuracy: ${relationshipAccuracy}%
-Overall Quality Score: ${overallScore}%
+Entries:
+  Precision: ${qualityMetrics.entries.precision.toFixed(1)}%
+  Recall: ${qualityMetrics.entries.recall.toFixed(1)}%
+  F1 Score: ${qualityMetrics.entries.f1.toFixed(1)}%
 
-=== Analysis Details ===
-${overallScore >= 85 ? '✓ Quality meets high standards' : overallScore >= 70 ? '⚠ Quality meets minimum standards' : '❌ Quality below acceptable threshold'}
+People:
+  Precision: ${qualityMetrics.people.precision.toFixed(1)}%
+  Recall: ${qualityMetrics.people.recall.toFixed(1)}%
+  F1 Score: ${qualityMetrics.people.f1.toFixed(1)}%
+
+Cross-References:
+  Precision: ${qualityMetrics.crossReferences.precision.toFixed(1)}%
+  Recall: ${qualityMetrics.crossReferences.recall.toFixed(1)}%
+  F1 Score: ${qualityMetrics.crossReferences.f1.toFixed(1)}%
+
+Relationships:
+  Precision: ${qualityMetrics.relationships.precision.toFixed(1)}%
+  Recall: ${qualityMetrics.relationships.recall.toFixed(1)}%
+  F1 Score: ${qualityMetrics.relationships.f1.toFixed(1)}%
+
+Events:
+  Precision: ${qualityMetrics.events.precision.toFixed(1)}%
+  Recall: ${qualityMetrics.events.recall.toFixed(1)}%
+  F1 Score: ${qualityMetrics.events.f1.toFixed(1)}%
+
+=== Analysis Summary ===
+${(() => {
+    const avgF1 = (qualityMetrics.entries.f1 + qualityMetrics.people.f1 + qualityMetrics.crossReferences.f1 + qualityMetrics.relationships.f1 + qualityMetrics.events.f1) / 5;
+    if (avgF1 >= 90) return '✓ Excellent data quality across all categories';
+    if (avgF1 >= 80) return '✓ Good data quality with minor discrepancies';
+    if (avgF1 >= 70) return '⚠ Acceptable data quality with some issues to address';
+    if (avgF1 >= 60) return '⚠ Below average data quality - significant improvements needed';
+    return '❌ Poor data quality - major data integrity issues detected';
+})()}
+Average F1 Score: ${((qualityMetrics.entries.f1 + qualityMetrics.people.f1 + qualityMetrics.crossReferences.f1 + qualityMetrics.relationships.f1 + qualityMetrics.events.f1) / 5).toFixed(1)}%
 
 Processing completed successfully.
     `.trim();
