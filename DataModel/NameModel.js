@@ -130,6 +130,144 @@ class NameModel {
         
         return initials;
     }
+
+    /**
+     * Check if this name exactly matches another name
+     * @param {NameModel} otherName - The other NameModel to compare against
+     * @returns {boolean} True if both given name and surname match exactly (case-insensitive)
+     */
+    exactMatch(otherName) {
+        if (!otherName || !(otherName instanceof NameModel)) {
+            return false;
+        }
+
+        return this.givenName.toLowerCase() === otherName.givenName.toLowerCase() &&
+               this.surname.toLowerCase() === otherName.surname.toLowerCase();
+    }
+
+    /**
+     * Check if this name is similar to another name using phonetic matching
+     * @param {NameModel} otherName - The other NameModel to compare against
+     * @returns {boolean} True if the names sound similar using Soundex algorithm
+     */
+    similarMatch(otherName) {
+        if (!otherName || !(otherName instanceof NameModel)) {
+            return false;
+        }
+
+        // If names match exactly, they are similar
+        if (this.exactMatch(otherName)) {
+            return true;
+        }
+
+        // Compare using Soundex algorithm
+        const thisSoundex = this._getSoundex(this.givenName + ' ' + this.surname);
+        const otherSoundex = this._getSoundex(otherName.givenName + ' ' + otherName.surname);
+
+        // Also compare individual components
+        const thisGivenSoundex = this._getSoundex(this.givenName);
+        const thisSurnameSoundex = this._getSoundex(this.surname);
+        const otherGivenSoundex = this._getSoundex(otherName.givenName);
+        const otherSurnameSoundex = this._getSoundex(otherName.surname);
+
+        // Names are similar if:
+        // 1. Both given names and surnames have same soundex respectively, or
+        // 2. Both given names AND surnames are variations (not just one or the other)
+        // Note: Removed full name soundex comparison as it can be unreliable for different surnames
+        return (thisGivenSoundex === otherGivenSoundex && thisSurnameSoundex === otherSurnameSoundex) ||
+               (this._areNameVariations(this.givenName, otherName.givenName) && 
+                this._areNameVariations(this.surname, otherName.surname));
+    }
+
+    /**
+     * Generate Soundex code for a string
+     * @param {string} str - The string to generate Soundex for
+     * @returns {string} Four-character Soundex code
+     * @private
+     */
+    _getSoundex(str) {
+        if (!str || typeof str !== 'string') {
+            return '0000';
+        }
+
+        // Convert to uppercase and remove non-alphabetic characters
+        str = str.toUpperCase().replace(/[^A-Z]/g, '');
+        
+        if (str.length === 0) {
+            return '0000';
+        }
+
+        // Keep the first letter
+        let soundex = str.charAt(0);
+        
+        // Soundex mapping
+        const mapping = {
+            'B': '1', 'F': '1', 'P': '1', 'V': '1',
+            'C': '2', 'G': '2', 'J': '2', 'K': '2', 'Q': '2', 'S': '2', 'X': '2', 'Z': '2',
+            'D': '3', 'T': '3',
+            'L': '4',
+            'M': '5', 'N': '5',
+            'R': '6'
+        };
+
+        let previousCode = mapping[soundex] || '';
+
+        // Process remaining characters
+        for (let i = 1; i < str.length && soundex.length < 4; i++) {
+            const char = str.charAt(i);
+            const code = mapping[char];
+
+            if (code && code !== previousCode) {
+                soundex += code;
+                previousCode = code;
+            } else if (!code) {
+                // Vowels, H, W, Y reset the previous code
+                previousCode = '';
+            }
+        }
+
+        // Pad with zeros if necessary
+        return soundex.padEnd(4, '0');
+    }
+
+    /**
+     * Check if two names are common variations of each other
+     * @param {string} name1 - First name to compare
+     * @param {string} name2 - Second name to compare
+     * @returns {boolean} True if names are known variations
+     * @private
+     */
+    _areNameVariations(name1, name2) {
+        if (!name1 || !name2) return false;
+        
+        const n1 = name1.toLowerCase();
+        const n2 = name2.toLowerCase();
+        
+        // Common name variations that might have different Soundex codes
+        const variations = [
+            ['catherine', 'katherine', 'kathryn', 'katharine'],
+            ['christopher', 'kristopher'],
+            ['christian', 'kristian'],
+            ['carol', 'karol'],
+            ['claire', 'klaire'],
+            ['philip', 'phillip'],
+            ['jeffrey', 'geoffrey'],
+            ['stephen', 'steven'],
+            ['ann', 'anne'],
+            ['john', 'jon'],
+            ['michael', 'micheal'],
+            ['william', 'willem']
+        ];
+
+        // Check if both names are in the same variation group
+        for (const group of variations) {
+            if (group.includes(n1) && group.includes(n2)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 module.exports = NameModel;

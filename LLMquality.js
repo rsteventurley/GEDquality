@@ -18,6 +18,7 @@ const PORT = process.env.PORT || 3000;
 // Import the data model classes
 const GedReader = require('./GEDCOM/GedReader');
 const XmlReader = require('./XML/XmlReader');
+const CompareModels = require('./DataModel/CompareModels');
 
 // Configure multer for file uploads to temporary directory
 const upload = multer({
@@ -125,12 +126,28 @@ app.post('/api/rate', async (req, res) => {
             });
         }
 
-                // Process the GEDCOM file
+        // Function to extract location from filename (basename without page number and extension)
+        function extractLocationFromFilename(originalName) {
+            if (!originalName) return '';
+            
+            // Remove the extension first
+            const nameWithoutExt = originalName.replace(/\.[^.]+$/, '');
+            
+            // Remove page number pattern (.###) from the end
+            const nameWithoutPage = nameWithoutExt.replace(/\.\d{3}$/, '');
+            
+            return nameWithoutPage || '';
+        }
+
+        // Process the GEDCOM file
         let gedPageModel;
         try {
             const gedReader = new GedReader();
             const gedModel = gedReader.read(uploadedFiles.gedcom.path);
             gedPageModel = gedModel.toPageModel(); // Convert GEDCOM to PageModel
+            
+            // Extract and set location from GEDCOM filename
+            gedPageModel.location = extractLocationFromFilename(uploadedFiles.gedcom.originalName);
         } catch (error) {
             console.error('Error processing GEDCOM file:', error);
             return res.status(500).json({
@@ -145,6 +162,9 @@ app.post('/api/rate', async (req, res) => {
             const xmlReader = new XmlReader();
             const xmlModel = await xmlReader.readXml(uploadedFiles.xml.path);
             xmlPageModel = xmlModel.toPageModel();
+            
+            // Extract and set location from XML filename
+            xmlPageModel.location = extractLocationFromFilename(uploadedFiles.xml.originalName);
         } catch (error) {
             console.error('Error processing XML file:', error);
             return res.status(500).json({
@@ -153,9 +173,23 @@ app.post('/api/rate', async (req, res) => {
             });
         }
 
+        // Fill surnames and events for both PageModels before comparison
+        try {
+            gedPageModel.fillSurname();
+            gedPageModel.fillEvents();
+            
+            xmlPageModel.fillSurname();
+            xmlPageModel.fillEvents();
+        } catch (error) {
+            console.error('Error filling surnames and events:', error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to fill surnames and events: ' + error.message
+            });
+        }
+
         // Compare the models and generate results
         const results = await compareModels(gedPageModel, xmlPageModel, {
-            location,
             gedcomFile: uploadedFiles.gedcom.originalName,
             xmlFile: uploadedFiles.xml.originalName
         });
@@ -179,8 +213,34 @@ app.post('/api/rate', async (req, res) => {
 
 // Helper function to compare models and generate results
 async function compareModels(gedPageModel, xmlPageModel, metadata) {
-    // This is a simulation of the comparison logic
-    // In a real implementation, you would compare the actual data structures
+    // Helper function to get event information for a person
+    function getPersonEventInfo(person) {
+        if (!person) return '';
+        
+        // Look for birth or death events to provide meaningful context
+        if (person.birth && person.birth.date) {
+            return ` (b. ${person.birth.date})`;
+        }
+        if (person.death && person.death.date) {
+            return ` (d. ${person.death.date})`;
+        }
+        if (person.events && person.events.length > 0) {
+            const event = person.events[0];
+            if (event.date) {
+                return ` (${event.type}: ${event.date})`;
+            }
+        }
+        return '';
+    }
+
+    // Create CompareModels object to analyze the differences
+    const comparer = new CompareModels(gedPageModel, xmlPageModel);
+    
+    // Get entry comparison results
+    const entryComparison = comparer.compareEntries();
+    const peopleComparison = comparer.comparePeople();
+    const referencesComparison = comparer.compareReferences();
+    const summary = comparer.getSummary();
     
     const gedEntryCount = gedPageModel.getEntryCount();
     const xmlEntryCount = xmlPageModel.getEntryCount();
@@ -193,9 +253,190 @@ async function compareModels(gedPageModel, xmlPageModel, metadata) {
     const relationshipAccuracy = Math.floor(Math.random() * 30) + 65; // 65-94%
     const overallScore = Math.floor((nameAccuracy + dateAccuracy + relationshipAccuracy) / 3);
     
+    // Create detailed entry comparison report
+    let entryReport = '';
+    if (entryComparison.onlyInFirst.length > 0) {
+        entryReport += `\n=== Entries in GEDCOM but not in XML (${entryComparison.onlyInFirst.length}) ===\n`;
+        entryComparison.onlyInFirst.forEach(entryId => {
+            entryReport += `  • ${entryId}\n`;
+        });
+    }
+    
+    if (entryComparison.onlyInSecond.length > 0) {
+        entryReport += `\n=== Entries in XML but not in GEDCOM (${entryComparison.onlyInSecond.length}) ===\n`;
+        entryComparison.onlyInSecond.forEach(entryId => {
+            entryReport += `  • ${entryId}\n`;
+        });
+    }
+    
+    if (entryComparison.onlyInFirst.length === 0 && entryComparison.onlyInSecond.length === 0) {
+        entryReport += `\n=== Entry Comparison ===\n✓ All entries match between GEDCOM and XML files\n`;
+    }
+
+    // Create detailed people comparison report
+    let peopleReport = '';
+    if (peopleComparison.entriesCompared > 0) {
+        peopleReport += `\n=== People Comparison Results ===\n`;
+        peopleReport += `Entries compared: ${peopleComparison.entriesCompared}\n`;
+        peopleReport += `Total people matches: ${peopleComparison.totalMatches}\n`;
+        peopleReport += `  • Exact name matches: ${peopleComparison.exactNameMatches}\n`;
+        peopleReport += `  • Event/Reference matches: ${peopleComparison.eventReferenceMatches}\n`;
+        peopleReport += `  • Relationship similar matches: ${peopleComparison.relationshipSimilarMatches}\n`;
+        peopleReport += `  • Similar name matches: ${peopleComparison.similarNameMatches}\n`;
+        
+        // Add precision analysis
+        peopleReport += `\n=== Precision Analysis ===\n`;
+        peopleReport += `Precise matches (exact names): ${peopleComparison.preciseMatches}\n`;
+        peopleReport += `Imprecise matches (different names): ${peopleComparison.impreciseMatches}\n`;
+        peopleReport += `Precision rate: ${peopleComparison.precisionRate.toFixed(1)}%\n`;
+        
+        // Show detailed unmatched people information (recall issues)
+        let totalUnmatchedInFirst = 0;
+        let totalUnmatchedInSecond = 0;
+        let unmatchedDetailsFirst = '';
+        let unmatchedDetailsSecond = '';
+        
+        // Show detailed imprecise matches (precision issues)
+        let impreciseMatchDetails = '';
+        
+        peopleComparison.details.forEach(detail => {
+            // Process unmatched people (recall issues)
+            if (detail.unmatchedInFirst.length > 0) {
+                totalUnmatchedInFirst += detail.unmatchedInFirst.length;
+                unmatchedDetailsFirst += `\n  Entry ${detail.entryId}:\n`;
+                detail.unmatchedInFirst.forEach(person => {
+                    const personObj = gedPageModel.people[person.id];
+                    const eventInfo = getPersonEventInfo(personObj);
+                    unmatchedDetailsFirst += `    • ${person.name}${eventInfo}\n`;
+                });
+            }
+            if (detail.unmatchedInSecond.length > 0) {
+                totalUnmatchedInSecond += detail.unmatchedInSecond.length;
+                unmatchedDetailsSecond += `\n  Entry ${detail.entryId}:\n`;
+                detail.unmatchedInSecond.forEach(person => {
+                    const personObj = xmlPageModel.people[person.id];
+                    const eventInfo = getPersonEventInfo(personObj);
+                    unmatchedDetailsSecond += `    • ${person.name}${eventInfo}\n`;
+                });
+            }
+            
+            // Process imprecise matches (precision issues)
+            detail.matches.forEach(match => {
+                const person1 = gedPageModel.people[match.person1Id];
+                const person2 = xmlPageModel.people[match.person2Id];
+                
+                if (person1 && person2 && !person1.name.exactMatch(person2.name)) {
+                    if (!impreciseMatchDetails.includes(`Entry ${detail.entryId}:`)) {
+                        impreciseMatchDetails += `\n  Entry ${detail.entryId}:\n`;
+                    }
+                    const eventInfo1 = getPersonEventInfo(person1);
+                    const eventInfo2 = getPersonEventInfo(person2);
+                    impreciseMatchDetails += `    • ${match.person1Name}${eventInfo1} ↔ ${match.person2Name}${eventInfo2} [${match.matchType}]\n`;
+                }
+            });
+        });
+        
+        peopleReport += `Unmatched people in GEDCOM: ${totalUnmatchedInFirst}`;
+        if (unmatchedDetailsFirst) {
+            peopleReport += unmatchedDetailsFirst;
+        } else {
+            peopleReport += '\n';
+        }
+        
+        peopleReport += `Unmatched people in XML: ${totalUnmatchedInSecond}`;
+        if (unmatchedDetailsSecond) {
+            peopleReport += unmatchedDetailsSecond;
+        } else {
+            peopleReport += '\n';
+        }
+        
+        if (impreciseMatchDetails) {
+            peopleReport += `\nImprecise matches (${peopleComparison.impreciseMatches}):${impreciseMatchDetails}`;
+        }
+        
+        if (peopleComparison.details.length > 0 && peopleComparison.totalMatches > 0) {
+            peopleReport += `\nMatch Quality Analysis:\n`;
+            const matchQuality = (peopleComparison.exactNameMatches + peopleComparison.eventReferenceMatches) / peopleComparison.totalMatches * 100;
+            peopleReport += `  • High confidence matches: ${Math.round(matchQuality)}%\n`;
+        }
+    } else {
+        peopleReport += `\n=== People Comparison ===\nNo common entries found for people comparison.\n`;
+    }
+
+    // Create detailed cross-references comparison report
+    let referencesReport = '';
+    if (referencesComparison.entriesCompared > 0) {
+        referencesReport += `\n=== Cross-References Comparison Results ===\n`;
+        referencesReport += `Entries compared: ${referencesComparison.entriesCompared}\n`;
+        referencesReport += `People matches analyzed: ${referencesComparison.totalMatches}\n`;
+        referencesReport += `Cross-reference recall errors: ${referencesComparison.crossReferenceRecallErrors}\n`;
+        referencesReport += `Cross-reference precision errors: ${referencesComparison.crossReferencePrecisionErrors}\n`;
+        referencesReport += `Recall error rate: ${referencesComparison.recallErrorRate.toFixed(1)}%\n`;
+        referencesReport += `Precision error rate: ${referencesComparison.precisionErrorRate.toFixed(1)}%\n`;
+
+        // Show detailed recall errors
+        let totalRecallErrors = 0;
+        let recallErrorDetails = '';
+        
+        // Show detailed precision errors
+        let totalPrecisionErrors = 0;
+        let precisionErrorDetails = '';
+
+        referencesComparison.details.forEach(detail => {
+            // Process recall errors
+            if (detail.recallErrors.length > 0) {
+                totalRecallErrors += detail.recallErrors.length;
+                recallErrorDetails += `\n  Entry ${detail.entryId}:\n`;
+                detail.recallErrors.forEach(error => {
+                    const person1 = gedPageModel.people[error.person1Id];
+                    const person2 = xmlPageModel.people[error.person2Id];
+                    const eventInfo1 = getPersonEventInfo(person1);
+                    const eventInfo2 = getPersonEventInfo(person2);
+                    recallErrorDetails += `    • ${error.person1Name}${eventInfo1} ↔ ${error.person2Name}${eventInfo2}\n`;
+                    recallErrorDetails += `      Expected ${error.expectedCount} refs, found ${error.actualCount} refs\n`;
+                    recallErrorDetails += `      Missing references: [${error.missingReferences.join(', ')}]\n`;
+                });
+            }
+            
+            // Process precision errors
+            if (detail.precisionErrors.length > 0) {
+                totalPrecisionErrors += detail.precisionErrors.length;
+                precisionErrorDetails += `\n  Entry ${detail.entryId}:\n`;
+                detail.precisionErrors.forEach(error => {
+                    const person1 = gedPageModel.people[error.person1Id];
+                    const person2 = xmlPageModel.people[error.person2Id];
+                    const eventInfo1 = getPersonEventInfo(person1);
+                    const eventInfo2 = getPersonEventInfo(person2);
+                    precisionErrorDetails += `    • ${error.person1Name}${eventInfo1} ↔ ${error.person2Name}${eventInfo2}\n`;
+                    precisionErrorDetails += `      GEDCOM refs: [${error.person1References.join(', ')}]\n`;
+                    precisionErrorDetails += `      XML refs: [${error.person2References.join(', ')}]\n`;
+                    if (error.differentReferences1.length > 0) {
+                        precisionErrorDetails += `      Only in GEDCOM: [${error.differentReferences1.join(', ')}]\n`;
+                    }
+                    if (error.differentReferences2.length > 0) {
+                        precisionErrorDetails += `      Only in XML: [${error.differentReferences2.join(', ')}]\n`;
+                    }
+                });
+            }
+        });
+
+        if (recallErrorDetails) {
+            referencesReport += `\nCross-reference recall errors (${totalRecallErrors}):${recallErrorDetails}`;
+        }
+        
+        if (precisionErrorDetails) {
+            referencesReport += `\nCross-reference precision errors (${totalPrecisionErrors}):${precisionErrorDetails}`;
+        }
+        
+        if (totalRecallErrors === 0 && totalPrecisionErrors === 0) {
+            referencesReport += `\n✅ All cross-references match perfectly!\n`;
+        }
+    } else {
+        referencesReport += `\n=== Cross-References Comparison ===\nNo common entries found for cross-references comparison.\n`;
+    }
+    
     return `
 === LLM Quality Rating Results ===
-Location: ${metadata.location}
 GEDCOM File: ${metadata.gedcomFile}
 XML File: ${metadata.xmlFile}
 Timestamp: ${new Date().toISOString()}
@@ -205,6 +446,9 @@ GEDCOM Entries Processed: ${gedEntryCount}
 XML Entries Processed: ${xmlEntryCount}
 GEDCOM People Count: ${gedPeopleCount}
 XML People Count: ${xmlPeopleCount}
+Common Entries: ${summary.commonEntries}
+Location: ${summary.pageModel1.location}
+${entryReport}${peopleReport}${referencesReport}
 
 === Quality Metrics ===
 Name Accuracy: ${nameAccuracy}%
@@ -213,13 +457,7 @@ Relationship Accuracy: ${relationshipAccuracy}%
 Overall Quality Score: ${overallScore}%
 
 === Analysis Details ===
-✓ Files successfully processed and compared
-✓ Data models generated from both sources
-✓ Cross-reference validation completed
 ${overallScore >= 85 ? '✓ Quality meets high standards' : overallScore >= 70 ? '⚠ Quality meets minimum standards' : '❌ Quality below acceptable threshold'}
-
-=== Recommendations ===
-${nameAccuracy < 85 ? '• Review name extraction and standardization\n' : ''}${dateAccuracy < 80 ? '• Improve date parsing and validation\n' : ''}${relationshipAccuracy < 75 ? '• Enhance relationship detection algorithms\n' : ''}${overallScore >= 85 ? '• Current quality is excellent, maintain current processes' : '• Consider additional training or validation steps'}
 
 Processing completed successfully.
     `.trim();
@@ -262,11 +500,7 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, () => {
-    console.log('============================================================');
-    console.log('🚀 LLMquality Server Started');
-    console.log(`📡 Server running on http://localhost:${PORT}`);
-    console.log(`🌍 Access the application at: http://localhost:${PORT}`);
-    console.log('============================================================');
+    console.log('LLMquality Server Started on port ' + PORT);
 });
 
 module.exports = app;

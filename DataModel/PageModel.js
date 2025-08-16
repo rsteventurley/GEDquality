@@ -18,6 +18,7 @@ class PageModel {
         this.entries = {}; // Dictionary indexed by string entry id
         this.people = {};  // Dictionary indexed by integer person id
         this.families = {}; // Dictionary indexed by integer family id
+        this.location = ''; // Location extracted from filename
     }
 
     /**
@@ -373,6 +374,70 @@ class PageModel {
         const familyCount = this.getFamilyCount();
 
         return `<PageModel: ${entryCount} entries, ${peopleCount} people, ${familyCount} families>`;
+    }
+
+    /**
+     * Fill events for all people and families using the location from the filename
+     */
+    fillEvents() {
+        if (!this.location || this.location === '') {
+            return; // No location to fill with
+        }
+
+        // Fill events for all people in the people dictionary
+        for (const personId in this.people) {
+            const person = this.people[personId];
+            if (person && typeof person.fillEvents === 'function') {
+                person.fillEvents(this.location);
+            }
+        }
+
+        // Fill marriage events for all families in the families dictionary
+        for (const familyId in this.families) {
+            const family = this.families[familyId];
+            if (family && typeof family.fillMarriage === 'function') {
+                family.fillMarriage(this.location);
+            }
+        }
+
+        // Fill events for all entries
+        for (const entryId in this.entries) {
+            const entry = this.entries[entryId];
+            if (entry) {
+                // Fill events for people in this entry
+                if (entry.people) {
+                    for (const personId in entry.people) {
+                        const person = entry.people[personId];
+                        if (person && typeof person.fillEvents === 'function') {
+                            person.fillEvents(this.location);
+                        }
+                    }
+                }
+
+                // Fill marriage events for families in this entry
+                if (entry.families) {
+                    for (const familyId in entry.families) {
+                        const family = entry.families[familyId];
+                        if (family && typeof family.fillMarriage === 'function') {
+                            family.fillMarriage(this.location);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fill missing surnames for all people in all entries based on family relationships
+     */
+    fillSurname() {
+        // Iterate through all entries and call fillSurname for each
+        for (const entryId in this.entries) {
+            const entry = this.entries[entryId];
+            if (entry && typeof entry.fillSurname === 'function') {
+                entry.fillSurname(this.people); // Pass reference to PageModel's people dictionary
+            }
+        }
     }
 }
 

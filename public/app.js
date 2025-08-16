@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // DOM Elements
     const form = document.getElementById('dataForm');
-    const rateBtn = document.getElementById('rateBtn');
+    const compareBtn = document.getElementById('compareBtn');
     const helpBtn = document.getElementById('helpBtn');
     const saveBtn = document.getElementById('saveBtn');
     const btnText = document.querySelector('.btn-text');
@@ -125,9 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize form
     function initializeForm() {
         updateFormValidation();
-    }    // Save form values to localStorage
-    function saveFormValues() {
-        localStorage.setItem('selectedLocation', locationSelect.value);
     }
 
     // Form validation
@@ -161,14 +158,14 @@ document.addEventListener('DOMContentLoaded', function() {
     // Real-time validation
     function updateFormValidation() {
         const validation = validateForm();
-        rateBtn.disabled = !validation.isValid;
+        compareBtn.disabled = !validation.isValid;
         
         if (!validation.isValid) {
-            rateBtn.style.opacity = '0.6';
-            rateBtn.style.cursor = 'not-allowed';
+            compareBtn.style.opacity = '0.6';
+            compareBtn.style.cursor = 'not-allowed';
         } else {
-            rateBtn.style.opacity = '1';
-            rateBtn.style.cursor = 'pointer';
+            compareBtn.style.opacity = '1';
+            compareBtn.style.cursor = 'pointer';
         }
     }
 
@@ -345,19 +342,62 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Show loading state
     function showLoading() {
-        btnText.textContent = 'Rating...';
+        btnText.textContent = 'Comparing...';
         btnSpinner.style.display = 'inline-block';
-        rateBtn.disabled = true;
-        rateBtn.style.opacity = '0.8';
+        compareBtn.disabled = true;
+        compareBtn.style.opacity = '0.8';
     }
 
     // Hide loading state
     function hideLoading() {
-        btnText.textContent = 'Rate';
+        btnText.textContent = 'Compare';
         btnSpinner.style.display = 'none';
-        rateBtn.disabled = false;
-        rateBtn.style.opacity = '1';
+        compareBtn.disabled = false;
+        compareBtn.style.opacity = '1';
         updateFormValidation();
+    }
+    
+    // Hide loading state and reset UI after comparison
+    function hideLoadingAndReset() {
+        btnText.textContent = 'Compare';
+        btnSpinner.style.display = 'none';
+        compareBtn.disabled = true; // Keep disabled after comparison
+        compareBtn.style.opacity = '0.6';
+        
+        // Reset file selections
+        resetFileSelections();
+    }
+    
+    // Reset file selections and UI state
+    function resetFileSelections() {
+        // Clear file inputs
+        gedcomFile.value = '';
+        xmlFile.value = '';
+        
+        // Reset file displays - use empty string to show initial state
+        gedcomFileName.textContent = '';
+        xmlFileName.textContent = '';
+        
+        // Reset upload button states - find the correct spans
+        const gedcomUploadText = gedcomUploadBtn.querySelector('.upload-text');
+        const xmlUploadText = xmlUploadBtn.querySelector('.upload-text');
+        
+        if (gedcomUploadText) {
+            gedcomUploadText.textContent = 'Choose GEDCOM File';
+        }
+        if (xmlUploadText) {
+            xmlUploadText.textContent = 'Choose XML File';
+        }
+        
+        // Remove file-selected class if it exists
+        gedcomUploadBtn.classList.remove('file-selected');
+        xmlUploadBtn.classList.remove('file-selected');
+        
+        // Clear uploaded files tracking
+        uploadedFiles = {
+            gedcom: null,
+            xml: null
+        };
     }
 
     // Show success message
@@ -435,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showError('Error: ' + error.message);
             resultsArea.value = `Error: ${error.message}\n\nPlease check your configuration and try again.`;
         } finally {
-            hideLoading();
+            hideLoadingAndReset();
         }
     });
 
@@ -477,7 +517,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Update UI
                 gedcomFileName.textContent = file.name;
                 gedcomUploadBtn.classList.add('file-selected');
-                gedcomUploadBtn.querySelector('.upload-text').textContent = 'GEDCOM File Selected';
+                
+                const uploadTextElement = gedcomUploadBtn.querySelector('.upload-text');
+                if (uploadTextElement) {
+                    uploadTextElement.textContent = 'GEDCOM File Selected';
+                }
                 
                 updateFormValidation();
                 
@@ -635,11 +679,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Real-time validation listeners
-    locationSelect.addEventListener('change', updateFormValidation);
-
-    // Form value change listeners
-    locationSelect.addEventListener('change', saveFormValues);
-
     // Save to client machine functionality
     async function saveToClient(filename, content) {
         try {
@@ -721,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateFormValidation();
     
     // Welcome message
-    resultsArea.value = `Welcome to LLMquality!\n\nThis application helps you assess the quality of Large Language Model outputs when processing genealogical data.\n\n1. Select a location\n2. Upload your GEDCOM and XML files\n3. Click 'Rate' to begin assessment\n\nClick 'Help' for detailed instructions.`;
+    resultsArea.value = `Welcome to LLMquality!\n\nThis application helps you assess the quality of Large Language Model outputs when processing genealogical data.\n\n1. Upload your GEDCOM and XML files\n2. Click 'Compare' to begin assessment\n\nClick 'Help' for detailed instructions.`;
     
     console.log('LLMquality application initialized successfully');
 });

@@ -97,8 +97,11 @@ const entry1_xml = new EntryModel('family-001');
 
 // GEDCOM Entry 1 People
 const hans_mueller_ged = new PersonModel(new NameModel('Hans', 'Müller'));
+hans_mueller_ged.references = ['F001', 'C123']; // Test references
 const anna_schmidt_ged = new PersonModel(new NameModel('Anna', 'Schmidt'));
+anna_schmidt_ged.references = ['F001', 'F002']; // Test references
 const johann_weber_ged = new PersonModel(new NameModel('Johann', 'Weber'));
+johann_weber_ged.references = ['F003']; // Test reference
 
 entry1_ged.addPerson(1, 'hans', hans_mueller_ged);
 entry1_ged.addPerson(2, 'anna', anna_schmidt_ged);
@@ -106,7 +109,9 @@ entry1_ged.addPerson(3, 'johann', johann_weber_ged);
 
 // XML Entry 1 People - Some exact matches, some variations
 const hans_mueller_xml = new PersonModel(new NameModel('Hans', 'Müller')); // Exact match
+hans_mueller_xml.references = ['F001', 'C123']; // Same references (perfect match)
 const anne_schmidt_xml = new PersonModel(new NameModel('Anne', 'Schmidt')); // Similar to Anna
+anne_schmidt_xml.references = ['F001']; // Missing F002 (recall error)
 const wilhelm_fischer_xml = new PersonModel(new NameModel('Wilhelm', 'Fischer')); // Only in XML
 
 entry1_xml.addPerson(10, 'hans', hans_mueller_xml);
@@ -123,10 +128,11 @@ const entry2_xml = new EntryModel('family-002');
 // GEDCOM Entry 2 People with events and references
 const margarete_bauer_ged = new PersonModel(new NameModel('Margarete', 'Bauer'));
 margarete_bauer_ged.birth = new EventModel(new DateModel(1875, 6, 15, false, true), 'München');
-margarete_bauer_ged.references = ['@REF123@', '@REF456@'];
+margarete_bauer_ged.references = ['@REF123@', '@REF456@']; // Two references
 
 const thomas_zimmermann_ged = new PersonModel(new NameModel('Thomas', 'Zimmermann'));
 thomas_zimmermann_ged.death = new EventModel(new DateModel(1950, 12, 25, false, true), 'Hamburg');
+thomas_zimmermann_ged.references = ['@FAMILY001@', '@FAMILY002@']; // Test precision error
 
 entry2_ged.addPerson(4, 'margarete', margarete_bauer_ged);
 entry2_ged.addPerson(5, 'thomas', thomas_zimmermann_ged);
@@ -134,10 +140,11 @@ entry2_ged.addPerson(5, 'thomas', thomas_zimmermann_ged);
 // XML Entry 2 People with matching events/references but different names
 const greta_bauer_xml = new PersonModel(new NameModel('Greta', 'Bauer')); // Different name
 greta_bauer_xml.birth = new EventModel(new DateModel(1875, 6, 15, false, true), 'München'); // Same birth event
-greta_bauer_xml.references = ['@REF123@']; // Matching reference
+greta_bauer_xml.references = ['@REF123@']; // Missing @REF456@ (recall error)
 
 const tom_zimmermann_xml = new PersonModel(new NameModel('Tom', 'Zimmermann')); // Similar name
 tom_zimmermann_xml.death = new EventModel(new DateModel(1950, 12, 25, false, true), 'Hamburg'); // Same death event
+tom_zimmermann_xml.references = ['@FAMILY001@', '@FAMILY999@']; // Same count but different value (precision error)
 
 entry2_xml.addPerson(20, 'greta', greta_bauer_xml);
 entry2_xml.addPerson(21, 'tom', tom_zimmermann_xml);
@@ -265,6 +272,50 @@ entry6_ged.addPerson(91, 'ingrid', ingrid_ged);
 entry6_xml.addPerson(100, 'emil', emil_xml);
 entry6_xml.addPerson(101, 'astrid', astrid_xml);
 
+// ============================================
+// Test Case 7: Resolved Ambiguity Test
+// ============================================
+console.log('\n--- Test Case 7: Resolved Ambiguity Test ---');
+const entry7_ged = new EntryModel('family-007');
+const entry7_xml = new EntryModel('family-007');
+
+// Scenario: Three people named "Hans Schneider" in GEDCOM, three in XML
+// Two of them will match via events, leaving one exact name match that should be resolved
+const hans1_ged = new NameModel('Hans', 'Schneider');
+const hans2_ged = new NameModel('Hans', 'Schneider');
+const hans3_ged = new NameModel('Hans', 'Schneider');
+
+const hans1_xml = new NameModel('Hans', 'Schneider');
+const hans2_xml = new NameModel('Hans', 'Schneider');
+const hans3_xml = new NameModel('Hans', 'Schneider');
+
+// Create PersonModels
+const hans_person1_ged = new PersonModel(hans1_ged);
+const hans_person2_ged = new PersonModel(hans2_ged);
+const hans_person3_ged = new PersonModel(hans3_ged);
+
+const hans_person1_xml = new PersonModel(hans1_xml);
+const hans_person2_xml = new PersonModel(hans2_xml);
+const hans_person3_xml = new PersonModel(hans3_xml);
+
+// Give Hans #1 a unique birth event that will match
+hans_person1_ged.birth = new EventModel(new DateModel(1850, 5, 12, false, true), 'Heidelberg');
+hans_person1_xml.birth = new EventModel(new DateModel(1850, 5, 12, false, true), 'Heidelberg');
+
+// Give Hans #2 a unique death event that will match
+hans_person2_ged.death = new EventModel(new DateModel(1920, 11, 3, false, true), 'Stuttgart');
+hans_person2_xml.death = new EventModel(new DateModel(1920, 11, 3, false, true), 'Stuttgart');
+
+// Hans #3 has no events - should match by exact name after others are resolved
+
+entry7_ged.addPerson(110, 'hans1', hans_person1_ged);
+entry7_ged.addPerson(111, 'hans2', hans_person2_ged);
+entry7_ged.addPerson(112, 'hans3', hans_person3_ged);
+
+entry7_xml.addPerson(120, 'hans1', hans_person1_xml);
+entry7_xml.addPerson(121, 'hans2', hans_person2_xml);
+entry7_xml.addPerson(122, 'hans3', hans_person3_xml);
+
 // Add all entries to PageModels
 gedPageModelPeople.addEntry(entry1_ged);
 gedPageModelPeople.addEntry(entry2_ged);
@@ -272,6 +323,7 @@ gedPageModelPeople.addEntry(entry3_ged);
 gedPageModelPeople.addEntry(entry4_ged);
 gedPageModelPeople.addEntry(entry5_ged);
 gedPageModelPeople.addEntry(entry6_ged);
+gedPageModelPeople.addEntry(entry7_ged);
 
 xmlPageModelPeople.addEntry(entry1_xml);
 xmlPageModelPeople.addEntry(entry2_xml);
@@ -279,6 +331,7 @@ xmlPageModelPeople.addEntry(entry3_xml);
 xmlPageModelPeople.addEntry(entry4_xml);
 xmlPageModelPeople.addEntry(entry5_xml);
 xmlPageModelPeople.addEntry(entry6_xml);
+xmlPageModelPeople.addEntry(entry7_xml);
 
 // Also add people to PageModel's people dictionary for consistency
 gedPageModelPeople.people[1] = hans_mueller_ged.clone();
@@ -298,6 +351,9 @@ gedPageModelPeople.people[73] = extra_person_ged.clone();
 gedPageModelPeople.people[74] = werner_koch_ged.clone();
 gedPageModelPeople.people[90] = maximilian_ged.clone();
 gedPageModelPeople.people[91] = ingrid_ged.clone();
+gedPageModelPeople.people[110] = hans_person1_ged.clone();
+gedPageModelPeople.people[111] = hans_person2_ged.clone();
+gedPageModelPeople.people[112] = hans_person3_ged.clone();
 
 xmlPageModelPeople.people[10] = hans_mueller_xml.clone();
 xmlPageModelPeople.people[11] = anne_schmidt_xml.clone();
@@ -316,6 +372,9 @@ xmlPageModelPeople.people[83] = extra_person_xml.clone();
 xmlPageModelPeople.people[84] = pavel_novak_xml.clone();
 xmlPageModelPeople.people[100] = emil_xml.clone();
 xmlPageModelPeople.people[101] = astrid_xml.clone();
+xmlPageModelPeople.people[120] = hans_person1_xml.clone();
+xmlPageModelPeople.people[121] = hans_person2_xml.clone();
+xmlPageModelPeople.people[122] = hans_person3_xml.clone();
 
 // Create CompareModels object for people testing
 const peopleComparer = new CompareModels(gedPageModelPeople, xmlPageModelPeople);
@@ -333,13 +392,24 @@ console.log(`Similar name matches: ${peopleComparison.similarNameMatches}`);
 console.log(`Unmatched in GEDCOM: ${peopleComparison.unmatchedInFirst}`);
 console.log(`Unmatched in XML: ${peopleComparison.unmatchedInSecond}`);
 
+console.log('\n=== Precision Analysis ===');
+console.log(`Precise matches (exact names): ${peopleComparison.preciseMatches}`);
+console.log(`Imprecise matches (different names): ${peopleComparison.impreciseMatches}`);
+console.log(`Precision rate: ${peopleComparison.precisionRate.toFixed(1)}%`);
+
 console.log('\n=== Expected Non-Matching Scenarios ===');
-console.log('Test Case 5 & 6 demonstrate scenarios where people should NOT match:');
+console.log('Test Cases 5 & 6 demonstrate scenarios where people should NOT match:');
 console.log('• Identical names with no distinguishing data (ambiguous)');
 console.log('• Same first names but different surnames with no matching events');
 console.log('• Extra people in one file with no counterpart in the other');
 console.log('• Completely different names with different events');
 console.log('• Names that appear similar but are significantly different');
+
+console.log('\n=== Resolved Ambiguity Test ===');
+console.log('Test Case 7 demonstrates resolved ambiguity matching:');
+console.log('• Multiple people with identical names initially ambiguous');
+console.log('• Some matched via events/references, resolving ambiguity');
+console.log('• Remaining exact name matches should now be matched in final pass');
 
 console.log('\n=== Detailed Entry-by-Entry Results ===');
 peopleComparison.details.forEach((detail, index) => {
@@ -379,6 +449,47 @@ if (peopleComparison.totalMatches > 0) {
     const highConfidenceMatches = peopleComparison.exactNameMatches + peopleComparison.eventReferenceMatches;
     const confidenceRate = (highConfidenceMatches / peopleComparison.totalMatches * 100).toFixed(1);
     console.log(`\nOverall confidence rate: ${confidenceRate}% (${highConfidenceMatches}/${peopleComparison.totalMatches} high-confidence matches)`);
+    console.log(`Overall precision rate: ${peopleComparison.precisionRate.toFixed(1)}% (${peopleComparison.preciseMatches}/${peopleComparison.totalMatches} exact name matches)`);
+    
+    if (peopleComparison.impreciseMatches > 0) {
+        console.log(`\n⚠️  Warning: ${peopleComparison.impreciseMatches} imprecise matches found!`);
+        console.log('These represent people matched with different names - review recommended.');
+    }
+}
+
+console.log('\n=== Testing compareReferences method ===');
+
+// Test cross-references comparison
+const referencesComparison = comparer.compareReferences();
+console.log(`\nCross-References Comparison Results:`);
+console.log(`Entries compared: ${referencesComparison.entriesCompared}`);
+console.log(`People matches analyzed: ${referencesComparison.totalMatches}`);
+console.log(`Cross-reference recall errors: ${referencesComparison.crossReferenceRecallErrors}`);
+console.log(`Cross-reference precision errors: ${referencesComparison.crossReferencePrecisionErrors}`);
+console.log(`Recall error rate: ${referencesComparison.recallErrorRate.toFixed(1)}%`);
+console.log(`Precision error rate: ${referencesComparison.precisionErrorRate.toFixed(1)}%`);
+
+// Show detailed results
+referencesComparison.details.forEach(detail => {
+    if (detail.recallErrors.length > 0 || detail.precisionErrors.length > 0) {
+        console.log(`\nEntry ${detail.entryId} cross-reference issues:`);
+        
+        detail.recallErrors.forEach(error => {
+            console.log(`  Recall Error: ${error.person1Name} ↔ ${error.person2Name}`);
+            console.log(`    Expected ${error.expectedCount} refs, found ${error.actualCount} refs`);
+            console.log(`    Missing references: [${error.missingReferences.join(', ')}]`);
+        });
+        
+        detail.precisionErrors.forEach(error => {
+            console.log(`  Precision Error: ${error.person1Name} ↔ ${error.person2Name}`);
+            console.log(`    GEDCOM refs: [${error.person1References.join(', ')}]`);
+            console.log(`    XML refs: [${error.person2References.join(', ')}]`);
+        });
+    }
+});
+
+if (referencesComparison.crossReferenceRecallErrors === 0 && referencesComparison.crossReferencePrecisionErrors === 0) {
+    console.log('\n✅ All cross-references match perfectly!');
 }
 
 console.log('\n✅ CompareModels tests completed!');

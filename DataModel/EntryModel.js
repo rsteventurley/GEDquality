@@ -365,6 +365,65 @@ class EntryModel {
         const summary = this.getSummary();
         return `<Entry: ${summary.id} - ${summary.peopleCount} people, ${summary.familiesCount} families>`;
     }
+
+    /**
+     * Fill missing surnames for people in this entry based on family relationships
+     * @param {Object} pageModelPeople - Reference to the PageModel's people dictionary for synchronization
+     */
+    fillSurname(pageModelPeople) {
+        // Iterate through each person in the entry
+        for (const personId in this.people) {
+            const person = this.people[personId];
+            const numericPersonId = parseInt(personId);
+            
+            // Check if person has a missing surname
+            if (person && person.name && person.name.surname === '') {
+                let newSurname = null;
+                
+                // Check all families to see if this person is involved
+                for (const familyId in this.families) {
+                    const family = this.families[familyId];
+                    if (!family) continue;
+                    
+                    const husband = family.getHusband();
+                    const children = family.getChildren();
+                    
+                    // Case 1: Person is a child, get father's surname
+                    if (children.includes(numericPersonId) && husband !== null && this.people[husband]) {
+                        const father = this.people[husband];
+                        if (father && father.name && father.name.surname !== '') {
+                            newSurname = father.name.surname;
+                            break; // Found surname from father
+                        }
+                    }
+                    
+                    // Case 2: Person is a husband, get child's surname
+                    if (husband === numericPersonId) {
+                        for (const childId of children) {
+                            if (this.people[childId]) {
+                                const child = this.people[childId];
+                                if (child && child.name && child.name.surname !== '') {
+                                    newSurname = child.name.surname;
+                                    break; // Found surname from child
+                                }
+                            }
+                        }
+                        if (newSurname) break; // Stop looking if we found a surname
+                    }
+                }
+                
+                // If we found a surname, update both the entry person and PageModel person
+                if (newSurname) {
+                    person.name.surname = newSurname;
+                    
+                    // Also update the corresponding person in the PageModel's people dictionary
+                    if (pageModelPeople && pageModelPeople[personId]) {
+                        pageModelPeople[personId].name.surname = newSurname;
+                    }
+                }
+            }
+        }
+    }
 }
 
 module.exports = EntryModel;
