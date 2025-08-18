@@ -570,11 +570,14 @@ async function compareModels(gedPageModel, xmlPageModel, metadata) {
                     const eventInfo2 = getPersonEventInfo(person2);
                     eventRecallErrorDetails += `    • ${error.person1Name}${eventInfo1} ↔ ${error.person2Name}${eventInfo2}\n`;
                     
+                    // Map 'first' to 'GEDCOM' and 'second' to 'XML' for user-friendly error messages
+                    const fileType = error.missingIn === 'first' ? 'GEDCOM' : 'XML';
+                    
                     if (error.eventType === 'marriage') {
                         eventRecallErrorDetails += `      Missing ${error.eventType} event: ${error.families1Count} vs ${error.families2Count} families\n`;
-                        eventRecallErrorDetails += `      Missing in: ${error.missingIn} PageModel\n`;
+                        eventRecallErrorDetails += `      Missing in: ${fileType} file\n`;
                     } else {
-                        eventRecallErrorDetails += `      Missing ${error.eventType} event in: ${error.missingIn} PageModel\n`;
+                        eventRecallErrorDetails += `      Missing ${error.eventType} event in: ${fileType} file\n`;
                         eventRecallErrorDetails += `      GEDCOM ${error.eventType}: ${error.event1 || 'None'}\n`;
                         eventRecallErrorDetails += `      XML ${error.eventType}: ${error.event2 || 'None'}\n`;
                     }
