@@ -329,9 +329,9 @@ class GedFamily {
                     if (child.children) {
                         for (const grandchild of child.children) {
                             if (grandchild.tag === 'DATE') {
-                                family.marriage.addAttribute('divorce_date', grandchild.value);
+                                family.marriage.setAttribute('divorce_date', grandchild.value);
                             } else if (grandchild.tag === 'PLAC') {
-                                family.marriage.addAttribute('divorce_place', grandchild.value);
+                                family.marriage.setAttribute('divorce_place', grandchild.value);
                             }
                         }
                     }
