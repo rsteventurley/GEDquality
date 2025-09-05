@@ -48,6 +48,38 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
+// Helper function to fix filename encoding issues
+function fixFilenameEncoding(filename) {
+    try {
+        // Check if the filename is already properly encoded (doesn't contain invalid UTF-8 patterns)
+        if (!filename.includes('Ã')) {
+            return filename;
+        }
+        
+        // Convert from Latin-1 to UTF-8 by treating each character as a byte
+        const bytes = [];
+        for (let i = 0; i < filename.length; i++) {
+            bytes.push(filename.charCodeAt(i) & 0xFF);
+        }
+        
+        // Convert bytes to UTF-8 string
+        const result = Buffer.from(bytes).toString('utf8');
+        
+        // Validate that the result is sensible UTF-8
+        // If it contains replacement characters, fall back to original
+        if (result.includes('�')) {
+            console.warn('Encoding fix resulted in replacement characters, using original filename');
+            return filename;
+        }
+        
+        return result;
+    } catch (error) {
+        // If conversion fails, return original filename
+        console.warn('Failed to fix filename encoding:', error);
+        return filename;
+    }
+}
+
 // API route to handle GEDCOM file upload
 app.post('/api/upload-gedcom', upload.single('gedcom'), (req, res) => {
     try {
@@ -58,16 +90,19 @@ app.post('/api/upload-gedcom', upload.single('gedcom'), (req, res) => {
             });
         }
 
+        // Fix encoding of the original filename
+        const fixedFilename = fixFilenameEncoding(req.file.originalname);
+
         // Store the uploaded file info
         uploadedFiles.gedcom = {
-            originalName: req.file.originalname,
+            originalName: fixedFilename,
             path: req.file.path,
             size: req.file.size
         };
 
         res.json({
             success: true,
-            fileName: req.file.originalname,
+            fileName: fixedFilename,
             message: 'GEDCOM file uploaded successfully'
         });
     } catch (error) {
@@ -88,16 +123,19 @@ app.post('/api/upload-xml', upload.single('xml'), (req, res) => {
             });
         }
 
+        // Fix encoding of the original filename
+        const fixedFilename = fixFilenameEncoding(req.file.originalname);
+
         // Store the uploaded file info
         uploadedFiles.xml = {
-            originalName: req.file.originalname,
+            originalName: fixedFilename,
             path: req.file.path,
             size: req.file.size
         };
 
         res.json({
             success: true,
-            fileName: req.file.originalname,
+            fileName: fixedFilename,
             message: 'XML file uploaded successfully'
         });
     } catch (error) {

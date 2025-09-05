@@ -236,6 +236,11 @@ class CompareModels {
                 if (matched2.has(person2.id)) continue;
 
                 if (person1.person.name.exactMatch(person2.person.name)) {
+                    // Check birth date compatibility first
+                    if (!this._haveSimilarBirthDates(person1.person, person2.person)) {
+                        continue;
+                    }
+                    
                     // Check if this name is unique in entry2
                     const sameNameInEntry2 = people2.filter(p => p.person.name.exactMatch(person2.person.name));
                     if (sameNameInEntry2.length === 1) { // Must be unique
@@ -268,6 +273,11 @@ class CompareModels {
                 if (matched2.has(person2.id)) continue;
 
                 if (this._hasMatchingEventsOrReferences(person1.person, person2.person)) {
+                    // Check birth date compatibility first
+                    if (!this._haveSimilarBirthDates(person1.person, person2.person)) {
+                        continue;
+                    }
+                    
                     result.matches.push({
                         person1Id: person1.id,
                         person2Id: person2.id,
@@ -296,6 +306,11 @@ class CompareModels {
                 if (matched2.has(person2.id)) continue;
 
                 if (person1.person.name.similarMatch(person2.person.name)) {
+                    // Check birth date compatibility first
+                    if (!this._haveSimilarBirthDates(person1.person, person2.person)) {
+                        continue;
+                    }
+                    
                     // Additional check: surnames should be similar too for relationship matching
                     // Don't match people with completely different surnames unless they have other evidence
                     const surname1 = person1.person.name.surname.toLowerCase();
@@ -356,6 +371,11 @@ class CompareModels {
                 if (matched2.has(person2.id)) continue;
 
                 if (person1.person.name.similarMatch(person2.person.name)) {
+                    // Check birth date compatibility first
+                    if (!this._haveSimilarBirthDates(person1.person, person2.person)) {
+                        continue;
+                    }
+                    
                     // For exact name matches, check for uniqueness to avoid ambiguous matches
                     if (person1.person.name.exactMatch(person2.person.name)) {
                         const sameNameInEntry1 = people1.filter(p => p.person.name.exactMatch(person1.person.name));
@@ -397,6 +417,11 @@ class CompareModels {
                 if (matched2.has(person2.id)) continue;
 
                 if (person1.person.name.exactMatch(person2.person.name)) {
+                    // Check birth date compatibility first
+                    if (!this._haveSimilarBirthDates(person1.person, person2.person)) {
+                        continue;
+                    }
+                    
                     // Check if this name is now unique among unmatched people
                     const unmatchedPeople1 = people1.filter(p => !matched1.has(p.id));
                     const unmatchedPeople2 = people2.filter(p => !matched2.has(p.id));
@@ -421,6 +446,28 @@ class CompareModels {
                 }
             }
         }
+    }
+
+    /**
+     * Check if two people have compatible birth dates (not too far apart)
+     * @param {PersonModel} person1 - First person to compare
+     * @param {PersonModel} person2 - Second person to compare
+     * @returns {boolean} True if birth dates are compatible or unknown
+     * @private
+     */
+    _haveSimilarBirthDates(person1, person2) {
+        const birthYear1 = person1.birth && person1.birth.date ? person1.birth.date.year : null;
+        const birthYear2 = person2.birth && person2.birth.date ? person2.birth.date.year : null;
+        
+        // If either birth year is unknown, consider them compatible
+        if (!birthYear1 || !birthYear2 || birthYear1 === 0 || birthYear2 === 0) {
+            return true;
+        }
+        
+        // Allow up to 5 years difference for birth dates
+        // This accounts for approximate dates and minor recording errors
+        const yearDifference = Math.abs(birthYear1 - birthYear2);
+        return yearDifference <= 5;
     }
 
     /**
