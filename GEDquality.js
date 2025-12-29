@@ -13,7 +13,7 @@ const multer = require('multer');
 const os = require('os');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Import the data model classes
 const GedReader = require('./GEDCOM/GedReader');
