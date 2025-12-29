@@ -1,0 +1,109 @@
+0 HEAD
+1 SOUR GEDquality Test Suite
+2 VERS 1.0.0
+1 GEDC
+2 VERS 5.5.1
+2 FORM LINEAGE-LINKED
+1 CHAR UTF-8
+1 SUBM @SUBM1@
+
+0 @SUBM1@ SUBM
+1 NAME Test Administrator
+
+0 @S1@ SOUR
+1 TITL OFB Testdorf
+1 ABBR OFB Testdorf
+
+0 @I1@ INDI
+1 NAME Johann /Müller/
+2 GIVN Johann
+2 SURN Müller
+1 SEX M
+1 BIRT
+2 DATE 15 JAN 1800
+2 PLAC Testdorf, Bayern
+1 DEAT
+2 DATE 20 MAR 1870
+2 PLAC Testdorf, Bayern
+1 SOUR @S1@
+2 PAGE 123
+1 FAMS @F1@
+
+0 @I2@ INDI
+1 NAME Anna /Schmidt/
+2 GIVN Anna
+2 SURN Schmidt
+1 SEX F
+1 BIRT
+2 DATE 10 FEB 1805
+2 PLAC Testdorf, Bayern
+1 DEAT
+2 DATE 15 JUN 1875
+2 PLAC Testdorf, Bayern
+1 SOUR @S1@
+2 PAGE 123
+1 FAMS @F1@
+
+0 @I3@ INDI
+1 NAME Peter /Müller/
+2 GIVN Peter
+2 SURN Müller
+1 SEX M
+1 BIRT
+2 DATE 5 MAY 1830
+2 PLAC Testdorf, Bayern
+1 DEAT
+2 DATE 10 OCT 1900
+2 PLAC Testdorf, Bayern
+1 SOUR @S1@
+2 PAGE 123
+1 FAMC @F1@
+1 FAMS @F2@
+
+0 @I4@ INDI
+1 NAME Maria /Weber/
+2 GIVN Maria
+2 SURN Weber
+1 SEX F
+1 BIRT
+2 DATE 20 JUL 1835
+2 PLAC Testdorf, Bayern
+1 DEAT
+2 DATE 5 DEC 1905
+2 PLAC Testdorf, Bayern
+1 SOUR @S1@
+2 PAGE 123
+1 FAMS @F2@
+
+0 @I5@ INDI
+1 NAME Elisabeth /Müller/
+2 GIVN Elisabeth
+2 SURN Müller
+1 SEX F
+1 BIRT
+2 DATE 12 MAR 1860
+2 PLAC Testdorf, Bayern
+1 DEAT
+2 DATE 25 APR 1940
+2 PLAC Testdorf, Bayern
+1 SOUR @S1@
+2 PAGE 123
+1 FAMC @F2@
+
+0 @F1@ FAM
+1 HUSB @I1@
+1 WIFE @I2@
+1 CHIL @I3@
+1 MARR
+2 DATE 10 JUN 1825
+2 PLAC Testdorf, Bayern
+
+0 @F2@ FAM
+1 HUSB @I3@
+1 WIFE @I4@
+1 CHIL @I5@
+1 MARR
+2 DATE 15 APR 1855
+2 PLAC Testdorf, Bayern
+
+0 TRLR

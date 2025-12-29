@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LLMquality v1.1 - Genealogical Data Processing</title>
+    <title>GEDquality v1.0 - GEDCOM Integrity Checker</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🧬 LLMquality <span class="version">v1.1</span></h1>
-            <p>Genealogical Data Processing & Quality Assessment</p>
+            <h1>🧬 GEDquality <span class="version">v1.0</span></h1>
+            <p>GEDCOM File Integrity Checker</p>
         </header>
 
         <main>
@@ -26,20 +26,9 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>XML File:</label>
-                    <div class="file-upload-container">
-                        <input type="file" id="xmlFile" accept=".xml" style="display: none;">
-                        <button type="button" id="xmlUploadBtn" class="btn-upload">
-                            <span class="upload-text">Choose XML File</span>
-                            <span class="file-name" id="xmlFileName"></span>
-                        </button>
-                    </div>
-                </div>
-
                 <div class="form-actions">
-                    <button type="submit" id="compareBtn" disabled>
-                        <span class="btn-text">Compare</span>
+                    <button type="submit" id="checkBtn" disabled>
+                        <span class="btn-text">Check Integrity</span>
                         <span class="btn-spinner" style="display: none;">⏳</span>
                     </button>
                     <button type="button" id="helpBtn" class="btn-info">Help</button>
@@ -51,7 +40,7 @@
                     <h3>Results</h3>
                     <button type="button" id="saveBtn" class="btn-secondary">Save</button>
                 </div>
-                <textarea id="resultsArea" class="results-textarea" readonly placeholder="Processing results will appear here..."></textarea>
+                <textarea id="resultsArea" class="results-textarea" readonly placeholder="Integrity check results will appear here..."></textarea>
             </div>
 
             <div id="error" class="error-container" style="display: none;">
@@ -61,7 +50,7 @@
         </main>
 
         <footer>
-            <p>&copy; 2025 LLMquality System | Genealogical Data Processing</p>
+            <p>&copy; 2025 GEDquality System | GEDCOM Integrity Checker</p>
         </footer>
     </div>
 
@@ -69,45 +58,58 @@
     <div id="helpModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Help - How to Use LLMquality</h2>
+                <h2>Help - How to Use GEDquality</h2>
                 <span class="modal-close" id="closeHelpModal">&times;</span>
             </div>
             <div class="modal-body">
                 <div class="help-content">
                     <h3>📍 Getting Started</h3>
-                    <p>LLMquality helps you assess the quality of Large Language Model (LLM) outputs when processing genealogical data.</p>
-                    
+                    <p>GEDquality checks the internal integrity of GEDCOM files from German Ortsfamilienbücher (OFB).</p>
+
                     <h3>🔧 Basic Usage</h3>
                     <ol>
-                        <li><strong>GEDCOM File:</strong> Upload your reference GEDCOM file by clicking "Choose GEDCOM File"</li>
-                        <li><strong>XML File:</strong> Upload the LLM-generated XML file by clicking "Choose XML File"</li>
-                        <li><strong>Compare:</strong> Click the Compare button to begin the quality assessment process</li>
+                        <li><strong>GEDCOM File:</strong> Upload your GEDCOM file by clicking "Choose GEDCOM File"</li>
+                        <li><strong>Check:</strong> Click "Check Integrity" to analyze the file</li>
+                        <li><strong>Review:</strong> Review the results and warnings</li>
+                        <li><strong>Save:</strong> Optionally save the results to a text file</li>
                     </ol>
 
-                    <h3>📁 File Upload</h3>
-                    <p>Upload the required files for analysis:</p>
+                    <h3>🔍 What GEDquality Checks</h3>
+                    <p>GEDquality performs comprehensive integrity checks including:</p>
                     <ul>
-                        <li><strong>GEDCOM File:</strong> The reference genealogical data file (.ged or .gedcom format)</li>
-                        <li><strong>XML File:</strong> The LLM-generated output file (.xml format)</li>
+                        <li><strong>Family Membership:</strong> Ensures each person is in at least one family (as parent or child)</li>
+                        <li><strong>Page Consistency:</strong> Verifies all people are from the same OFB page</li>
+                        <li><strong>Date Validation:</strong> Checks that dates are valid GEDCOM format</li>
+                        <li><strong>Date Logic:</strong> Detects inconsistencies like:
+                            <ul>
+                                <li>Birth after death</li>
+                                <li>Children born before parents' marriage</li>
+                                <li>Children born after mother's death</li>
+                                <li>Excessive lifespans (>120 years)</li>
+                                <li>Mother over 50 at child's birth</li>
+                            </ul>
+                        </li>
+                        <li><strong>Given Names:</strong> Identifies unusual given names for German-speaking regions</li>
+                        <li><strong>Gender Consistency:</strong> Checks if gender matches the given name</li>
+                        <li><strong>Source References:</strong> Ensures each person has entry label source</li>
+                        <li><strong>Surname Consistency:</strong> Checks children have consistent surnames with father and siblings</li>
                     </ul>
-                    <p>Both files are uploaded securely to the server for processing and are automatically cleaned up after analysis.</p>
 
                     <h3>📊 Results</h3>
-                    <p>The results area will display:</p>
+                    <p>The results display:</p>
                     <ul>
-                        <li>Accuracy percentages for names, dates, and relationships</li>
-                        <li>Overall quality score</li>
-                        <li>Detailed analysis of processed records</li>
-                        <li>Quality metrics by category</li>
-                        <li>Recommendations for improvement</li>
+                        <li>File summary (entries, people, families)</li>
+                        <li>Entry details with counts</li>
+                        <li>Warnings grouped by category</li>
+                        <li>Overall quality assessment</li>
                     </ul>
 
                     <h3>💡 Tips</h3>
                     <ul>
-                        <li>Ensure your directories are properly configured before rating</li>
-                        <li>Use consistent page numbering across your datasets</li>
-                        <li>Compare results across different LLMs for the same data</li>
-                        <li>Review recommendations to improve data quality</li>
+                        <li>Fix critical issues first (date inconsistencies, missing family links)</li>
+                        <li>Unusual given names may be valid variants or errors - review manually</li>
+                        <li>Gender mismatches might indicate transcription errors</li>
+                        <li>Surname inconsistencies often indicate adoptions or remarriages</li>
                     </ul>
                 </div>
             </div>
@@ -127,7 +129,7 @@
             <div class="modal-body">
                 <div class="form-group">
                     <label for="fileName">File Name:</label>
-                    <input type="text" id="fileName" name="fileName" placeholder="Enter file name (e.g., results.txt)">
+                    <input type="text" id="fileName" name="fileName" placeholder="Enter file name (e.g., integrity-report.txt)">
                 </div>
             </div>
             <div class="modal-footer">
@@ -137,6 +139,6 @@
         </div>
     </div>
 
-    <script src="/app.js"></script>
+    <script src="/gedquality-app.js"></script>
 </body>
 </html>

@@ -1,30 +1,28 @@
 {
-  "name": "llmquality",
-  "version": "1.1.0",
-  "description": "Compare a GEDCOM file from RootsMagic and an XML file from Claude for data extracted from German Ortssippenbücher",
-  "main": "index.js",
+  "name": "gedquality",
+  "version": "1.0.0",
+  "description": "GEDCOM file integrity checker for German Ortsfamilienbücher - validates internal consistency, dates, names, and family relationships",
+  "main": "GEDquality.js",
   "scripts": {
-    "start": "node LLMquality.js",
-    "dev": "nodemon LLMquality.js",
+    "start": "node GEDquality.js",
+    "dev": "nodemon GEDquality.js",
     "test": "mocha test/**/*.js --timeout 10000",
     "test:readers": "mocha test/readerMethodTest.js --timeout 5000"
   },
   "keywords": [
     "gedcom",
-    "xml",
     "genealogy",
-    "llm",
-    "data-comparison",
-    "rootsmagic"
+    "integrity-check",
+    "data-validation",
+    "ortsfamilienbuch",
+    "ofb",
+    "german-genealogy"
   ],
   "author": "Steve Turley <rsturley@churchofjesuschrist.org>",
   "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.5",
     "express": "^4.21.2",
-    "fs-extra": "^11.1.1",
-    "multer": "^1.4.5-lts.1",
-    "xml2js": "^0.6.2"
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
     "mocha": "^10.8.2",
