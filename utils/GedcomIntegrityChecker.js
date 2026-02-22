@@ -182,7 +182,7 @@ class GedcomIntegrityChecker {
         for (const [gedcomId, individual] of Object.entries(individuals)) {
             if (!individual.name) continue;
 
-            const givenName = individual.name.given || '';
+            const givenName = individual.name.givenName || '';
             if (!givenName) continue;
 
             // Split compound names and check the first part
@@ -210,7 +210,7 @@ class GedcomIntegrityChecker {
         for (const [gedcomId, individual] of Object.entries(individuals)) {
             if (!individual.name || !individual.gender) continue;
 
-            const givenName = individual.name.given || '';
+            const givenName = individual.name.givenName || '';
             if (!givenName) continue;
 
             // Split compound names and check the first part
@@ -520,10 +520,12 @@ class GedcomIntegrityChecker {
      * Get page number from source
      */
     getPageFromSource(individual) {
-        // Extract page number from source record
-        // This would depend on how sources are structured in your GEDCOM
-        const source = individual.source || '';
-        const pageMatch = source.match(/Page\s+(\d+)/i);
+        // Extract page number from source record.
+        // Sources may be a bare number (e.g. "1363") or "Page 1363" style.
+        const source = (individual.source || '').trim();
+        if (!source) return null;
+        // Match bare number or "Page N" style
+        const pageMatch = source.match(/^(?:Page\s+)?(\d+)$/i);
         return pageMatch ? pageMatch[1] : null;
     }
 
