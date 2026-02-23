@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GEDquality v1.0 - GEDCOM Integrity Checker</title>
+    <title>GEDquality v1.1 - GEDCOM Integrity Checker</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🧬 GEDquality <span class="version">v1.0</span></h1>
+            <h1>🧬 GEDquality <span class="version">v1.1</span></h1>
             <p>GEDCOM File Integrity Checker</p>
         </header>
 
@@ -63,53 +63,80 @@
             </div>
             <div class="modal-body">
                 <div class="help-content">
-                    <h3>📍 Getting Started</h3>
-                    <p>GEDquality checks the internal integrity of GEDCOM files from German Ortsfamilienbücher (OFB).</p>
+                    <h3>📍 What is GEDquality?</h3>
+                    <p>GEDquality validates the internal consistency of GEDCOM files exported from German Ortsfamilienbücher (OFB) databases. It helps you identify data quality issues, transcription errors, and logical inconsistencies in your genealogical data.</p>
 
-                    <h3>🔧 Basic Usage</h3>
+                    <h3>🔧 How to Use</h3>
                     <ol>
-                        <li><strong>GEDCOM File:</strong> Upload your GEDCOM file by clicking "Choose GEDCOM File"</li>
-                        <li><strong>Check:</strong> Click "Check Integrity" to analyze the file</li>
-                        <li><strong>Review:</strong> Review the results and warnings</li>
-                        <li><strong>Save:</strong> Optionally save the results to a text file</li>
+                        <li><strong>Upload:</strong> Click "Choose GEDCOM File" to select your .ged file</li>
+                        <li><strong>Analyze:</strong> Click "Check Integrity" to run all validation checks</li>
+                        <li><strong>Review:</strong> Examine the results to identify data issues</li>
+                        <li><strong>Save:</strong> Optionally save the report for documentation</li>
                     </ol>
 
-                    <h3>🔍 What GEDquality Checks</h3>
-                    <p>GEDquality performs comprehensive integrity checks including:</p>
+                    <h3>🔍 Integrity Checks Explained</h3>
+
+                    <h4>Family Entry Consistency Issues</h4>
+                    <p><strong>What it checks:</strong> In German Ortsfamilienbücher, each family is typically documented in a single numbered entry (e.g., entry 1363, 1364). This check verifies that within each family unit, all members (father, mother, and children) come from the same OFB entry number.</p>
+                    <p><strong>Why it matters:</strong> When family members have different entry numbers, it may indicate data entry errors, incorrect family relationships, or mixing of people who shouldn't be in the same family unit.</p>
+                    <p><strong>What to do:</strong> If you see this warning:</p>
                     <ul>
-                        <li><strong>Family Membership:</strong> Ensures each person is in at least one family (as parent or child)</li>
-                        <li><strong>Page Consistency:</strong> Verifies all people are from the same OFB page</li>
-                        <li><strong>Date Validation:</strong> Checks that dates are valid GEDCOM format</li>
-                        <li><strong>Date Logic:</strong> Detects inconsistencies like:
-                            <ul>
-                                <li>Birth after death</li>
-                                <li>Children born before parents' marriage</li>
-                                <li>Children born after mother's death</li>
-                                <li>Excessive lifespans (>120 years)</li>
-                                <li>Mother over 50 at child's birth</li>
-                            </ul>
-                        </li>
-                        <li><strong>Given Names:</strong> Identifies unusual given names for German-speaking regions</li>
-                        <li><strong>Gender Consistency:</strong> Checks if gender matches the given name</li>
-                        <li><strong>Source References:</strong> Ensures each person has entry label source</li>
-                        <li><strong>Surname Consistency:</strong> Checks children have consistent surnames with father and siblings</li>
+                        <li>Verify the family relationships are correct (check if people truly belong in the same family)</li>
+                        <li>Review the source entry numbers for each family member against your source documents</li>
+                        <li>Check for errors in your genealogy software where people may have been linked to wrong families</li>
+                        <li>Note: It's OK to have multiple entries in one GEDCOM file, but each family should be internally consistent</li>
                     </ul>
 
-                    <h3>📊 Results</h3>
-                    <p>The results display:</p>
+                    <h4>People Not in Families</h4>
+                    <p><strong>What it checks:</strong> Every person should be part of at least one family unit (either as a parent or child), unless they are the only person documented in their entry.</p>
+                    <p><strong>What to do:</strong> Add the person to the appropriate family or verify they should exist as a standalone entry.</p>
+
+                    <h4>Date Format Issues</h4>
+                    <p><strong>What it checks:</strong> Dates must follow standard GEDCOM format (e.g., "15 JAN 1900", "JAN 1900", "ABT 1900").</p>
+                    <p><strong>What to do:</strong> Correct malformed dates in your genealogy software and re-export the GEDCOM file.</p>
+
+                    <h4>Date Logic Errors</h4>
+                    <p><strong>What it checks:</strong> Chronological impossibilities like:</p>
                     <ul>
-                        <li>File summary (entries, people, families)</li>
-                        <li>Entry details with counts</li>
-                        <li>Warnings grouped by category</li>
-                        <li>Overall quality assessment</li>
+                        <li>Birth after death</li>
+                        <li>Children born before parents married</li>
+                        <li>Children born after mother died</li>
+                        <li>Lifespans exceeding 120 years</li>
+                        <li>Mothers giving birth after age 50</li>
+                    </ul>
+                    <p><strong>What to do:</strong> Review the dates in your source documents. These often indicate transcription errors, date estimation problems, or incorrect person matching.</p>
+
+                    <h4>Unusual Given Names</h4>
+                    <p><strong>What it checks:</strong> Compares given names against a database of common German names from the region.</p>
+                    <p><strong>What to do:</strong> Review unusual names - they may be valid historical variants, spelling errors, or transcription mistakes. Cross-reference with original documents.</p>
+
+                    <h4>Gender Mismatches</h4>
+                    <p><strong>What it checks:</strong> Verifies that recorded gender matches the expected gender for the given name.</p>
+                    <p><strong>What to do:</strong> These typically indicate transcription errors or incorrect data entry. Verify against source documents.</p>
+
+                    <h4>Missing Source References</h4>
+                    <p><strong>What it checks:</strong> Each person should have a SOUR record containing their OFB entry number.</p>
+                    <p><strong>What to do:</strong> Add source citations in your genealogy software to document which OFB entry each person comes from.</p>
+
+                    <h4>Surname Inconsistencies</h4>
+                    <p><strong>What it checks:</strong> Children should typically share their father's surname, and siblings should have matching surnames.</p>
+                    <p><strong>What to do:</strong> Review for data entry errors. Valid reasons include adoption, remarriage, illegitimacy, or naming customs where children took the mother's surname.</p>
+
+                    <h3>📊 Understanding Results</h3>
+                    <p>The report shows:</p>
+                    <ul>
+                        <li><strong>File Summary:</strong> Overview of entries, people, and families</li>
+                        <li><strong>Entry Details:</strong> People and family counts per entry</li>
+                        <li><strong>Warnings by Category:</strong> Grouped issues for easier review</li>
+                        <li><strong>Quality Assessment:</strong> Overall data quality rating</li>
                     </ul>
 
-                    <h3>💡 Tips</h3>
+                    <h3>💡 Best Practices</h3>
                     <ul>
-                        <li>Fix critical issues first (date inconsistencies, missing family links)</li>
-                        <li>Unusual given names may be valid variants or errors - review manually</li>
-                        <li>Gender mismatches might indicate transcription errors</li>
-                        <li>Surname inconsistencies often indicate adoptions or remarriages</li>
+                        <li><strong>Priority:</strong> Fix date logic errors and missing family links first - these indicate serious data problems</li>
+                        <li><strong>Context matters:</strong> Not all warnings are errors. Historical German naming practices, illegitimacy, and adoption create legitimate exceptions</li>
+                        <li><strong>Document decisions:</strong> When you determine a warning is valid (not an error), document why in your genealogy software</li>
+                        <li><strong>Iterative process:</strong> Fix issues in your genealogy software, re-export GEDCOM, and run GEDquality again to verify corrections</li>
                     </ul>
                 </div>
             </div>

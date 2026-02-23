@@ -3,7 +3,7 @@
  * A GEDCOM file integrity checker for genealogical data
  *
  * @author Steve Turley
- * @version 1.0.0
+ * @version 1.1.0
  */
 
 const express = require('express');
@@ -173,31 +173,46 @@ function formatResults(filename, report) {
     const { summary, warnings, errors } = report;
 
     let result = `
-=== GEDquality Integrity Report ===
-GEDCOM File: ${filename}
-Timestamp: ${new Date().toISOString()}
+╔════════════════════════════════════════════════════════════════════════════╗
+║                    GEDquality Integrity Report                             ║
+╚════════════════════════════════════════════════════════════════════════════╝
 
-=== File Summary ===
-Total Entries: ${summary.totalEntries}
+File: ${filename}
+Generated: ${new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+
+────────────────────────────────────────────────────────────────────────────
+FILE SUMMARY
+────────────────────────────────────────────────────────────────────────────
+
+Total OFB Entries: ${summary.totalEntries}
 Total People: ${summary.totalPeople}
 Total Families: ${summary.totalFamilies}
 
-=== Entries ===
-Entry Labels: ${summary.entryLabels.join(', ')}
+Entry Numbers: ${summary.entryLabels.join(', ')}
 
-=== Entry Details ===`;
+Entry Breakdown:`;
 
     for (const [entry, details] of Object.entries(summary.entryDetails)) {
-        result += `\n  ${entry}: ${details.people} people, ${details.families} families`;
+        result += `\n  Entry ${entry.padEnd(6)} → ${details.people} people in ${details.families} ${details.families === 1 ? 'family' : 'families'}`;
     }
 
-    result += `\n\n=== Integrity Check Results ===
-Total Warnings: ${summary.warningCount}
-Total Errors: ${summary.errorCount}
+    result += `\n
+────────────────────────────────────────────────────────────────────────────
+INTEGRITY CHECK RESULTS
+────────────────────────────────────────────────────────────────────────────
+
+Total Issues Found: ${summary.warningCount + summary.errorCount}
+  • Warnings: ${summary.warningCount}
+  • Errors: ${summary.errorCount}
 `;
 
     if (warnings.length === 0 && errors.length === 0) {
-        result += `\n✅ No integrity issues found! The GEDCOM file appears to be well-formed.`;
+        result += `
+✅ EXCELLENT! No integrity issues detected.
+
+Your GEDCOM file appears to be well-formed with no data quality problems.
+All dates are valid, relationships are properly linked, and names are consistent.
+`;
     } else {
         // Group warnings by type
         const warningsByType = {};
@@ -208,60 +223,200 @@ Total Errors: ${summary.errorCount}
             warningsByType[warning.type].push(warning);
         }
 
-        // Format warnings by category
-        const typeLabels = {
-            'family_membership': 'People Not in Families',
-            'page_consistency': 'Page Consistency Issues',
-            'invalid_date_format': 'Invalid Date Formats',
-            'birth_after_death': 'Birth After Death',
-            'excessive_lifespan': 'Excessive Lifespans (>120 years)',
-            'child_before_marriage': 'Children Born Before Marriage',
-            'child_after_mother_death': 'Children Born After Mother\'s Death',
-            'mother_too_old': 'Mother Over 50 at Child\'s Birth',
-            'unusual_given_name': 'Unusual Given Names',
-            'gender_mismatch': 'Gender Mismatches',
-            'missing_source': 'Missing Source References',
-            'surname_mismatch': 'Surname Mismatches (Child vs Father)',
-            'inconsistent_child_surnames': 'Inconsistent Sibling Surnames'
+        // Format warnings by category with helpful descriptions
+        const typeInfo = {
+            'page_consistency': {
+                label: 'Family Entry Consistency Issues',
+                icon: '📋',
+                description: 'Families with members from different OFB entries',
+                action: 'ACTION: Verify family relationships and ensure all family members belong to the correct entry'
+            },
+            'family_membership': {
+                label: 'People Not in Families',
+                icon: '👥',
+                description: 'People who are not linked to any family',
+                action: 'ACTION: Link these people to their family or verify standalone entries'
+            },
+            'invalid_date_format': {
+                label: 'Invalid Date Formats',
+                icon: '📅',
+                description: 'Dates that do not follow GEDCOM standards',
+                action: 'ACTION: Correct date formats in your genealogy software'
+            },
+            'birth_after_death': {
+                label: 'Birth After Death',
+                icon: '⚠️',
+                description: 'People recorded as born after they died',
+                action: 'ACTION: Fix date errors - likely transcription mistakes'
+            },
+            'excessive_lifespan': {
+                label: 'Excessive Lifespans',
+                icon: '⏳',
+                description: 'People who lived longer than 120 years',
+                action: 'ACTION: Verify dates - likely wrong century or duplicate people'
+            },
+            'child_before_marriage': {
+                label: 'Children Born Before Marriage',
+                icon: '👶',
+                description: 'Children born before parents\' marriage date',
+                action: 'ACTION: Verify dates or check for common-law marriages'
+            },
+            'child_after_mother_death': {
+                label: 'Children Born After Mother\'s Death',
+                icon: '⚠️',
+                description: 'Children born after their mother died',
+                action: 'ACTION: Fix date errors or check for stepmother situations'
+            },
+            'mother_too_old': {
+                label: 'Mother Over 50 at Birth',
+                icon: '👵',
+                description: 'Mothers who gave birth after age 50',
+                action: 'ACTION: Verify dates or check for grandmother misidentification'
+            },
+            'unusual_given_name': {
+                label: 'Unusual Given Names',
+                icon: '📝',
+                description: 'Names not common in German-speaking regions',
+                action: 'ACTION: Verify spelling against original documents'
+            },
+            'gender_mismatch': {
+                label: 'Gender Mismatches',
+                icon: '⚧',
+                description: 'Gender does not match the given name',
+                action: 'ACTION: Check for transcription errors or data entry mistakes'
+            },
+            'missing_source': {
+                label: 'Missing Source References',
+                icon: '📄',
+                description: 'People without OFB entry source citations',
+                action: 'ACTION: Add SOUR records with entry numbers'
+            },
+            'surname_mismatch': {
+                label: 'Surname Mismatches',
+                icon: '👨‍👧',
+                description: 'Children with different surnames than father',
+                action: 'ACTION: Verify or document adoption/remarriage/naming customs'
+            },
+            'inconsistent_child_surnames': {
+                label: 'Inconsistent Sibling Surnames',
+                icon: '👧‍👦',
+                description: 'Siblings with different surnames',
+                action: 'ACTION: Verify or document half-siblings/adoption situations'
+            }
         };
 
-        for (const [type, typeWarnings] of Object.entries(warningsByType)) {
-            const label = typeLabels[type] || type;
-            result += `\n\n--- ${label} (${typeWarnings.length}) ---`;
+        // Sort warning types by severity (critical first)
+        const criticalTypes = ['birth_after_death', 'excessive_lifespan', 'child_after_mother_death',
+                              'page_consistency', 'family_membership'];
+        const sortedTypes = Object.keys(warningsByType).sort((a, b) => {
+            const aIsCritical = criticalTypes.includes(a);
+            const bIsCritical = criticalTypes.includes(b);
+            if (aIsCritical && !bIsCritical) return -1;
+            if (!aIsCritical && bIsCritical) return 1;
+            return 0;
+        });
 
+        for (const type of sortedTypes) {
+            const typeWarnings = warningsByType[type];
+            const info = typeInfo[type] || {
+                label: type,
+                icon: '•',
+                description: '',
+                action: ''
+            };
+
+            result += `\n
+${info.icon} ${info.label.toUpperCase()} (${typeWarnings.length})
+${'-'.repeat(76)}`;
+
+            if (info.description) {
+                result += `\n${info.description}`;
+            }
+
+            result += `\n`;
+
+            // Standard formatting for all warning types
             for (const warning of typeWarnings) {
                 result += `\n  • ${warning.message}`;
+            }
 
-                // Add additional details for specific types
-                if (type === 'page_consistency' && warning.details) {
-                    for (const [page, people] of Object.entries(warning.details)) {
-                        result += `\n    Page ${page}: ${people.map(p => p.name).join(', ')}`;
-                    }
-                }
+            if (info.action && typeWarnings.length <= 10) {
+                result += `\n\n${info.action}`;
             }
         }
 
-        // Format errors
+        // Format errors (if any)
         if (errors.length > 0) {
-            result += `\n\n--- Errors (${errors.length}) ---`;
+            result += `\n
+🛑 CRITICAL ERRORS (${errors.length})
+${'-'.repeat(76)}`;
             for (const error of errors) {
                 result += `\n  • ${error.message}`;
             }
         }
     }
 
-    result += `\n\n=== Analysis Summary ===`;
+    // Quality assessment with specific guidance
+    result += `\n
+────────────────────────────────────────────────────────────────────────────
+OVERALL DATA QUALITY ASSESSMENT
+────────────────────────────────────────────────────────────────────────────
+`;
+
     if (summary.warningCount === 0 && summary.errorCount === 0) {
-        result += `\n✅ Excellent data quality - no issues detected`;
+        result += `
+✅ EXCELLENT DATA QUALITY
+
+Your GEDCOM file has no detectable issues. The data appears to be:
+  • Properly structured with all family links
+  • Free of date inconsistencies
+  • Complete with source references
+  • Consistent in naming conventions
+
+You may proceed with confidence in your data quality.
+`;
     } else if (summary.warningCount < 5) {
-        result += `\n✓ Good data quality with minor issues`;
+        result += `
+✓ GOOD DATA QUALITY
+
+Your GEDCOM file has minor issues that should be reviewed. The data is
+generally reliable with a few items to verify.
+
+RECOMMENDATION: Review the warnings above, verify against source documents,
+and correct any genuine errors in your genealogy software.
+`;
     } else if (summary.warningCount < 15) {
-        result += `\n⚠ Acceptable data quality with some issues to review`;
+        result += `
+⚠ ACCEPTABLE DATA QUALITY WITH ISSUES
+
+Your GEDCOM file has several data quality issues that warrant attention.
+While the file is usable, these issues may affect data reliability.
+
+RECOMMENDATION: Prioritize fixing date logic errors and missing family links.
+Review other warnings and correct errors systematically.
+`;
     } else {
-        result += `\n⚠ Significant data quality issues detected - please review`;
+        result += `
+⚠ SIGNIFICANT DATA QUALITY ISSUES
+
+Your GEDCOM file has numerous data quality problems that should be addressed
+before proceeding with publication or analysis.
+
+RECOMMENDATION:
+  1. Focus on critical issues (date errors, missing links) first
+  2. Verify data against original source documents
+  3. Make corrections in your genealogy software
+  4. Re-export GEDCOM and run GEDquality again
+  5. Repeat until issue count is reduced significantly
+`;
     }
 
-    result += `\n\nProcessing completed successfully.`;
+    result += `
+────────────────────────────────────────────────────────────────────────────
+
+Processing completed successfully.
+Click "Help" for guidance on interpreting and fixing issues.
+`;
 
     return result.trim();
 }

@@ -94,33 +94,77 @@ class GedcomIntegrityChecker {
     }
 
     /**
-     * Check that all people are on the same page (from SOUR records)
+     * Check that each family unit has all members from the same entry (from SOUR records)
+     * It's OK to have multiple entries in a file, but each family should be internally consistent
      */
     checkPageConsistency() {
-        const individuals = this.gedModel.getIndividuals();
-        const pages = new Set();
-        const peopleByPage = {};
+        const families = this.gedModel.getFamilies();
 
-        for (const [gedcomId, individual] of Object.entries(individuals)) {
-            const page = this.getPageFromSource(individual);
-            if (page) {
-                pages.add(page);
-                if (!peopleByPage[page]) {
-                    peopleByPage[page] = [];
+        for (const [famId, family] of Object.entries(families)) {
+            const father = this.gedModel.getIndividualByNumericId(family.father);
+            const mother = this.gedModel.getIndividualByNumericId(family.mother);
+
+            // Collect all family member entries
+            const familyMembers = [];
+            const entryLabels = new Set();
+
+            if (father) {
+                const fatherEntry = this.getEntryLabel(father);
+                if (fatherEntry) {
+                    entryLabels.add(fatherEntry);
+                    familyMembers.push({
+                        role: 'father',
+                        name: this.formatPersonName(father),
+                        id: `@I${family.father}@`,
+                        entry: fatherEntry
+                    });
                 }
-                peopleByPage[page].push({
-                    id: gedcomId,
-                    name: this.formatPersonName(individual)
+            }
+
+            if (mother) {
+                const motherEntry = this.getEntryLabel(mother);
+                if (motherEntry) {
+                    entryLabels.add(motherEntry);
+                    familyMembers.push({
+                        role: 'mother',
+                        name: this.formatPersonName(mother),
+                        id: `@I${family.mother}@`,
+                        entry: motherEntry
+                    });
+                }
+            }
+
+            // Check each child
+            for (const childId of family.children) {
+                const child = this.gedModel.getIndividualByNumericId(childId);
+                if (child) {
+                    const childEntry = this.getEntryLabel(child);
+                    if (childEntry) {
+                        entryLabels.add(childEntry);
+                        familyMembers.push({
+                            role: 'child',
+                            name: this.formatPersonName(child),
+                            id: `@I${childId}@`,
+                            entry: childEntry
+                        });
+                    }
+                }
+            }
+
+            // If family members have different entries, issue a warning
+            if (entryLabels.size > 1) {
+                const memberDetails = familyMembers.map(m =>
+                    `${m.name} (${m.role}, Entry ${m.entry})`
+                ).join(', ');
+
+                this.warnings.push({
+                    type: 'page_consistency',
+                    familyId: famId,
+                    entries: Array.from(entryLabels),
+                    members: familyMembers,
+                    message: `Family ${famId} has members from ${entryLabels.size} different entries (${Array.from(entryLabels).join(', ')}): ${memberDetails}`
                 });
             }
-        }
-
-        if (pages.size > 1) {
-            this.warnings.push({
-                type: 'page_consistency',
-                message: `People are from ${pages.size} different pages: ${Array.from(pages).join(', ')}`,
-                details: peopleByPage
-            });
         }
     }
 

@@ -29,7 +29,7 @@ GEDquality performs extensive validation checks on GEDCOM files:
 - Checks gender consistency with given names
 
 ### Data Integrity
-- Verifies all people are from the same OFB page
+- Verifies all members of each family are from the same OFB entry
 - Ensures each person has proper source references with entry labels
 - Checks surname consistency within families
 - Validates children have consistent surnames with father and siblings
@@ -48,7 +48,7 @@ npm install
 npm start
 ```
 
-The application will start on port 3000. Open your browser to http://localhost:3000
+The application will start on port 3001. Open your browser to http://localhost:3001
 
 ### Development Mode
 
@@ -73,7 +73,7 @@ The application generates a comprehensive report including:
 - **Entry Details**: People and families per entry
 - **Warnings by Category**:
   - People not in families
-  - Page consistency issues
+  - Family entry consistency issues (family members from different entries)
   - Invalid date formats
   - Date logic problems
   - Unusual given names
@@ -90,7 +90,7 @@ rsteventurley@gmail.com
 
 ## Version
 
-1.0.0
+1.1.0
 
 ## License
 
@@ -166,6 +166,13 @@ node DataModel/test-PersonModel.js
 ```
 
 ## Changelog
+
+### Version 1.1.0 (2025-02-23)
+
+- Fixed given name property bug in name validation
+- Improved getPageFromSource regex for entry label extraction
+- Updated dependencies for security and stability
+- Enhanced error handling and user feedback
 
 ### Version 1.0.0 (2025-01-29)
 
