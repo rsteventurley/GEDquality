@@ -54,4 +54,48 @@ describe('GEDquality Server Integration Tests', function() {
             assert(packageContent.devDependencies.mocha, 'Should have mocha dev dependency');
         });
     });
+
+    describe('Token-Based Upload Tracking', function() {
+        it('should not use global uploadedFile singleton', function() {
+            const serverPath = path.join(__dirname, '../GEDquality.js');
+            const content = fs.readFileSync(serverPath, 'utf8');
+            assert(!content.includes('let uploadedFile'),
+                'Server must not use a global uploadedFile variable');
+        });
+
+        it('should declare an uploadedFiles Map', function() {
+            const serverPath = path.join(__dirname, '../GEDquality.js');
+            const content = fs.readFileSync(serverPath, 'utf8');
+            assert(content.includes('const uploadedFiles = new Map()'),
+                'Server must declare uploadedFiles as a Map');
+        });
+
+        it('should use crypto.randomUUID in upload handler', function() {
+            const serverPath = path.join(__dirname, '../GEDquality.js');
+            const content = fs.readFileSync(serverPath, 'utf8');
+            assert(content.includes('crypto.randomUUID()'),
+                'Upload handler must generate a UUID per upload');
+        });
+
+        it('should return fileId from upload endpoint', function() {
+            const serverPath = path.join(__dirname, '../GEDquality.js');
+            const content = fs.readFileSync(serverPath, 'utf8');
+            assert(content.includes('fileId'),
+                'Upload endpoint must return a fileId');
+        });
+
+        it('should read fileId from check request body', function() {
+            const serverPath = path.join(__dirname, '../GEDquality.js');
+            const content = fs.readFileSync(serverPath, 'utf8');
+            assert(content.includes('req.body.fileId') || content.includes('const { fileId }'),
+                'Check endpoint must read fileId from request body');
+        });
+
+        it('should set up TTL sweeper with setInterval', function() {
+            const serverPath = path.join(__dirname, '../GEDquality.js');
+            const content = fs.readFileSync(serverPath, 'utf8');
+            assert(content.includes('setInterval'),
+                'Server must set up a TTL sweeper for expired uploads');
+        });
+    });
 });
