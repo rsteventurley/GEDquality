@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveFileCancel = document.getElementById('saveFileCancel');
     const fileNameInput = document.getElementById('fileName');
 
-    let uploadedGedcomFile = false;
+    let uploadedFileId = null;
 
     // File upload handlers
     gedcomUploadBtn.addEventListener('click', function() {
@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     dataForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        if (!uploadedGedcomFile) {
+        if (!uploadedFileId) {
             showError('Please upload a GEDCOM file first');
             return;
         }
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success) {
                 gedcomFileName.textContent = result.fileName;
                 gedcomFileName.style.display = 'inline';
-                uploadedGedcomFile = true;
+                uploadedFileId = result.fileId;
                 checkBtn.disabled = false;
                 hideError();
             } else {
@@ -146,7 +146,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify({ fileId: uploadedFileId })
             });
 
             const result = await response.json();
@@ -161,10 +162,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Check error:', error);
             showError('Network error during integrity check');
         } finally {
-            // Reset button state
             btnText.style.display = 'inline';
             btnSpinner.style.display = 'none';
-            checkBtn.disabled = false;
+            resetUploadState();
         }
     }
 
@@ -199,5 +199,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function hideError() {
         errorDiv.style.display = 'none';
         errorContent.textContent = '';
+    }
+
+    /**
+     * Reset upload state
+     */
+    function resetUploadState() {
+        uploadedFileId = null;
+        gedcomFile.value = '';
+        gedcomFileName.textContent = '';
+        gedcomFileName.style.display = 'none';
+        checkBtn.disabled = true;
     }
 });
