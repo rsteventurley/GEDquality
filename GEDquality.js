@@ -43,7 +43,14 @@ const uploadLimiter = rateLimit({
 const uploadedFiles = new Map(); // fileId → { path, originalName, size, expires }
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+            upgradeInsecureRequests: null
+        }
+    }
+}));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
