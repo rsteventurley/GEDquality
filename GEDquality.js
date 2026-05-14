@@ -128,11 +128,22 @@ app.post('/api/upload-gedcom', uploadLimiter, upload.single('gedcom'), (req, res
 // API route to handle integrity check
 app.post('/api/check', uploadLimiter, async (req, res) => {
     try {
-        // Check if file is uploaded
-        if (!uploadedFile) {
+        const { fileId } = req.body;
+
+        if (!fileId) {
             return res.status(400).json({
                 success: false,
                 error: 'Please upload a GEDCOM file first'
+            });
+        }
+
+        const fileInfo = uploadedFiles.get(fileId);
+
+        if (!fileInfo || Date.now() > fileInfo.expires) {
+            if (fileInfo) cleanupUploadedFile(fileId);
+            return res.status(400).json({
+                success: false,
+                error: 'Upload not found or expired. Please upload again.'
             });
         }
 
@@ -140,9 +151,10 @@ app.post('/api/check', uploadLimiter, async (req, res) => {
         let gedModel;
         try {
             const gedReader = new GedReader();
-            gedModel = gedReader.read(uploadedFile.path);
+            gedModel = gedReader.read(fileInfo.path);
         } catch (error) {
             console.error('Error processing GEDCOM file:', error);
+            cleanupUploadedFile(fileId);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to process GEDCOM file'
@@ -156,17 +168,15 @@ app.post('/api/check', uploadLimiter, async (req, res) => {
             integrityReport = checker.checkIntegrity();
         } catch (error) {
             console.error('Error running integrity checks:', error);
+            cleanupUploadedFile(fileId);
             return res.status(500).json({
                 success: false,
                 error: 'Failed to run integrity checks'
             });
         }
 
-        // Generate formatted results
-        const results = formatResults(uploadedFile.originalName, integrityReport);
-
-        // Clean up uploaded file after processing
-        cleanupUploadedFile();
+        const results = formatResults(fileInfo.originalName, integrityReport);
+        cleanupUploadedFile(fileId);
 
         res.json({
             success: true,
