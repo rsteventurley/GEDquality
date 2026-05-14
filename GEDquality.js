@@ -9,8 +9,11 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 const multer = require('multer');
 const os = require('os');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,13 +27,23 @@ const upload = multer({
     dest: path.join(os.tmpdir(), 'gedquality-uploads'),
     limits: {
         fileSize: 10 * 1024 * 1024 // 10MB limit
+    },
+    fileFilter: (req, file, cb) => {
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, ext === '.ged');
     }
 });
 
-// Store uploaded file temporarily
-let uploadedFile = null;
+const uploadLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 20,
+    message: { success: false, error: 'Too many requests, please try again later.' }
+});
+
+const uploadedFiles = new Map(); // fileId → { path, originalName, size, expires }
 
 // Middleware
+app.use(helmet());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -77,7 +90,7 @@ function fixFilenameEncoding(filename) {
 }
 
 // API route to handle GEDCOM file upload
-app.post('/api/upload-gedcom', upload.single('gedcom'), (req, res) => {
+app.post('/api/upload-gedcom', uploadLimiter, upload.single('gedcom'), (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({
@@ -102,15 +115,16 @@ app.post('/api/upload-gedcom', upload.single('gedcom'), (req, res) => {
             message: 'GEDCOM file uploaded successfully'
         });
     } catch (error) {
+        console.error('Upload error:', error);
         res.status(500).json({
             success: false,
-            error: 'Failed to upload GEDCOM file: ' + error.message
+            error: 'Failed to upload GEDCOM file'
         });
     }
 });
 
 // API route to handle integrity check
-app.post('/api/check', async (req, res) => {
+app.post('/api/check', uploadLimiter, async (req, res) => {
     try {
         // Check if file is uploaded
         if (!uploadedFile) {
@@ -129,7 +143,7 @@ app.post('/api/check', async (req, res) => {
             console.error('Error processing GEDCOM file:', error);
             return res.status(500).json({
                 success: false,
-                error: 'Failed to process GEDCOM file: ' + error.message
+                error: 'Failed to process GEDCOM file'
             });
         }
 
@@ -142,7 +156,7 @@ app.post('/api/check', async (req, res) => {
             console.error('Error running integrity checks:', error);
             return res.status(500).json({
                 success: false,
-                error: 'Failed to run integrity checks: ' + error.message
+                error: 'Failed to run integrity checks'
             });
         }
 
@@ -161,7 +175,7 @@ app.post('/api/check', async (req, res) => {
         console.error('Error in check endpoint:', error);
         res.status(500).json({
             success: false,
-            error: 'Processing failed: ' + error.message
+            error: 'Processing failed'
         });
     }
 });
