@@ -99,18 +99,20 @@ app.post('/api/upload-gedcom', uploadLimiter, upload.single('gedcom'), (req, res
             });
         }
 
-        // Fix encoding of the original filename
         const fixedFilename = fixFilenameEncoding(req.file.originalname);
+        const fileId = crypto.randomUUID();
+        const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-        // Store the uploaded file info
-        uploadedFile = {
-            originalName: fixedFilename,
+        uploadedFiles.set(fileId, {
             path: req.file.path,
-            size: req.file.size
-        };
+            originalName: fixedFilename,
+            size: req.file.size,
+            expires
+        });
 
         res.json({
             success: true,
+            fileId,
             fileName: fixedFilename,
             message: 'GEDCOM file uploaded successfully'
         });
