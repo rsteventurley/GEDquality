@@ -447,18 +447,23 @@ Click "Help" for guidance on interpreting and fixing issues.
     return result.trim();
 }
 
-// Helper function to clean up uploaded file
-function cleanupUploadedFile() {
-    try {
-        if (uploadedFile && fs.existsSync(uploadedFile.path)) {
-            fs.unlinkSync(uploadedFile.path);
-        }
-        // Reset the uploaded file
-        uploadedFile = null;
-    } catch (error) {
-        console.error('Error cleaning up uploaded file:', error);
+function cleanupUploadedFile(fileId) {
+    const fileInfo = uploadedFiles.get(fileId);
+    if (fileInfo) {
+        try { fs.unlinkSync(fileInfo.path); } catch (_) {}
+        uploadedFiles.delete(fileId);
     }
 }
+
+setInterval(() => {
+    const now = Date.now();
+    for (const [fileId, fileInfo] of uploadedFiles) {
+        if (now > fileInfo.expires) {
+            try { fs.unlinkSync(fileInfo.path); } catch (_) {}
+            uploadedFiles.delete(fileId);
+        }
+    }
+}, 5 * 60 * 1000);
 
 // Error handling middleware
 app.use((error, req, res, next) => {
