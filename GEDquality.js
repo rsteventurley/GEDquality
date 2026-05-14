@@ -185,6 +185,7 @@ app.post('/api/check', uploadLimiter, async (req, res) => {
 
     } catch (error) {
         console.error('Error in check endpoint:', error);
+        if (fileId) cleanupUploadedFile(fileId);
         res.status(500).json({
             success: false,
             error: 'Processing failed'
@@ -459,8 +460,7 @@ setInterval(() => {
     const now = Date.now();
     for (const [fileId, fileInfo] of uploadedFiles) {
         if (now > fileInfo.expires) {
-            try { fs.unlinkSync(fileInfo.path); } catch (_) {}
-            uploadedFiles.delete(fileId);
+            cleanupUploadedFile(fileId);
         }
     }
 }, 5 * 60 * 1000);
