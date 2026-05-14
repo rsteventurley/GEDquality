@@ -45,8 +45,8 @@ const uploadedFiles = new Map(); // fileId → { path, originalName, size, expir
 // Middleware
 app.use(helmet({
     contentSecurityPolicy: {
+        useDefaults: true,
         directives: {
-            ...helmet.contentSecurityPolicy.getDefaultDirectives(),
             upgradeInsecureRequests: null
         }
     }
