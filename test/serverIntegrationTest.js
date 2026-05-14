@@ -80,8 +80,8 @@ describe('GEDquality Server Integration Tests', function() {
         it('should return fileId from upload endpoint', function() {
             const serverPath = path.join(__dirname, '../GEDquality.js');
             const content = fs.readFileSync(serverPath, 'utf8');
-            assert(content.includes('fileId'),
-                'Upload endpoint must return a fileId');
+            assert(content.includes('fileId,') || content.includes('fileId\n') || content.includes('fileId }'),
+                'Upload endpoint must return a fileId in the response JSON');
         });
 
         it('should read fileId from check request body', function() {
@@ -94,8 +94,8 @@ describe('GEDquality Server Integration Tests', function() {
         it('should set up TTL sweeper with setInterval', function() {
             const serverPath = path.join(__dirname, '../GEDquality.js');
             const content = fs.readFileSync(serverPath, 'utf8');
-            assert(content.includes('setInterval'),
-                'Server must set up a TTL sweeper for expired uploads');
+            assert(content.includes('setInterval') && content.includes('uploadedFiles.delete'),
+                'Server must set up a TTL sweeper that deletes expired entries from uploadedFiles');
         });
     });
 });
