@@ -423,17 +423,24 @@ class GedcomIntegrityChecker {
 
             // Check child born before marriage
             if (childBirthDate && marriageDate && childBirthDate < marriageDate) {
-                const entryLabel = this.getEntryLabel(child) || this.getEntryLabel(father) || this.getEntryLabel(mother);
-                this.warnings.push({
-                    type: 'child_before_marriage',
-                    familyId: famId,
-                    childId: `@I${childId}@`,
-                    childName: this.formatPersonName(child),
-                    entry: this.getEntryLabel(child),
-                    childBirthDate: child.birth.date,
-                    marriageDate: family.marriage.date,
-                    message: `Child ${this.formatPersonIdForError(child)} born before parents' marriage [Family: ${famId}, Entry: ${entryLabel || 'unknown'}]`
-                });
+                // Skip if birth date is year-only or approximate and falls in the same year as
+                // the marriage — a year-only date defaults to Jan 1, causing false positives
+                // when the marriage occurred later that same year (e.g., "um 1792" vs "NOV 1792").
+                const birthYearOnly = this.isYearOnlyOrApproximate(child.birth?.date);
+                const sameYear = childBirthDate.getFullYear() === marriageDate.getFullYear();
+                if (!(birthYearOnly && sameYear)) {
+                    const entryLabel = this.getEntryLabel(child) || this.getEntryLabel(father) || this.getEntryLabel(mother);
+                    this.warnings.push({
+                        type: 'child_before_marriage',
+                        familyId: famId,
+                        childId: `@I${childId}@`,
+                        childName: this.formatPersonName(child),
+                        entry: this.getEntryLabel(child),
+                        childBirthDate: child.birth.date,
+                        marriageDate: family.marriage.date,
+                        message: `Child ${this.formatPersonIdForError(child)} born before parents' marriage [Family: ${famId}, Entry: ${entryLabel || 'unknown'}]`
+                    });
+                }
             }
 
             // Check child born after mother's death
@@ -504,6 +511,17 @@ class GedcomIntegrityChecker {
                 message: `Invalid GEDCOM date format: "${dateStr}" for ${eventType} of ${personName}`
             });
         }
+    }
+
+    /**
+     * Returns true if the date string has no month — either year-only ("1792") or an
+     * approximate qualifier with only a year ("ABT 1792", "um 1792", "EST 1792", etc.).
+     * Such dates are parsed as January 1, so within-year comparisons are unreliable.
+     */
+    isYearOnlyOrApproximate(dateStr) {
+        if (!dateStr) return false;
+        const cleaned = dateStr.replace(/^(ABT|BEF|AFT|EST|CAL|um)\s+/i, '').trim();
+        return /^\d{4}$/.test(cleaned);
     }
 
     /**
