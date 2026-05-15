@@ -3,7 +3,7 @@
  * Checks for data consistency, completeness, and validity
  *
  * @author Steve Turley
- * @version 1.0.0
+ * @version 1.2.1
  */
 
 const { createDefaultGivenNames } = require('./names');

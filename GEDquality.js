@@ -3,7 +3,7 @@
  * A GEDCOM file integrity checker for genealogical data
  *
  * @author Steve Turley
- * @version 1.1.0
+ * @version 1.2.1
  */
 
 const express = require('express');

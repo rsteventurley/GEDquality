@@ -179,6 +179,11 @@ Gender codes: `M` male, `F` female, `?` unisex, `1M`/`1F` first-part-of-compound
 
 ## Changelog
 
+### Version 1.2.1 (2026-05-14)
+
+- Fixed false "child born before marriage" warning when birth date is year-only or approximate (e.g. "um 1792", "ABT 1792") and the marriage falls later in the same year
+- Added regression tests for the above fix
+
 ### Version 1.2.0 (2026-05-14)
 
 - Multi-user support: per-upload UUID token replaces global singleton; concurrent users are fully isolated
