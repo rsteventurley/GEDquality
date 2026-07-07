@@ -147,6 +147,35 @@ Uploaded files are stored temporarily and automatically deleted after processing
 - **File size limit**: 10 MB maximum upload size
 - **Per-user isolation**: each upload is tracked by a UUID token; concurrent users cannot affect each other's sessions
 
+### Web Application Firewall (WAF) — deferred, not currently enabled
+
+In production (us-east-1), this app sits behind an ALB shared with LLMquality
+(`gedquality.researchllm.org` / `llmquality.researchllm.org`, host-routed to separate
+target groups). AWS WAF is a request-inspection layer that can attach directly to that
+ALB — it's currently **not** attached, since nothing observed so far justifies its cost
+(a Web ACL plus per-rule/per-request charges).
+
+**Why it might matter later:** WAF blocks malicious *request content* (SQL injection
+patterns, known bad IPs, high-volume single-source abuse) at the edge, before it reaches
+the app. This app accepts file uploads, which is a common target for abuse — a flood of
+upload requests would currently be absorbed by the app itself (and its existing rate
+limiting), costing CPU/bandwidth on the instance rather than being rejected upfront.
+
+**How to tell if it's become necessary — check these signals:**
+- ALB CloudWatch metrics: sustained spikes in `RequestCountPerTarget`,
+  `HTTPCode_Target_4XX_Count`, or `HTTPCode_ELB_5XX_Count`.
+- `express-rate-limit` rejections showing up repeatedly in `pm2 logs gedquality` from the
+  same IP or IP range.
+- Enable ALB access logs (to S3) if not already on, and review for repeated requests
+  with attack-like patterns (SQLi/XSS strings in query params, credential-stuffing-style
+  paths) or a small number of source IPs generating a disproportionate share of traffic.
+
+**How to add it if needed:** attach an AWS WAF Web ACL to the existing ALB with the
+managed rule groups `AWSManagedRulesCommonRuleSet` and
+`AWSManagedRulesAmazonIpReputationList` (and a rate-based rule if the issue is
+volumetric). This is purely additive — no change to the ALB, target groups, or app code
+required.
+
 ## Testing
 
 ```bash
